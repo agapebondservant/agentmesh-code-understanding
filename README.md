@@ -48,9 +48,7 @@ Ensure that you have access to OpenAI-compatible endpoints for the
 following models:
 
 1. GraphRAG "chat" model 
-(see <a href="https://microsoft.github.io/graphrag/config/yaml" target="_blank">docs</a>)
-    
-Candidate models: 
+(see <a href="https://microsoft.github.io/graphrag/config/yaml" target="_blank">docs</a>). Candidate models: 
 - gpt-oss-120b (see: `https://huggingface.co/RedHatAI/gpt-oss-120b`)
 ```
 #################################
@@ -68,9 +66,7 @@ nohup python3 -m vllm.entrypoints.openai.api_server \
 ```
 
 2. GraphRAG "embedding" model 
-(see <a href="https://microsoft.github.io/graphrag/config/yaml" target="_blank">docs</a>)
-
-Candidate models:
+(see <a href="https://microsoft.github.io/graphrag/config/yaml" target="_blank">docs</a>). Candidate models:
 - e5-mistral-7b-instruct (see: `https://huggingface.co/intfloat/e5-mistral-7b-instruct`)
 ```
 #################################
@@ -85,8 +81,7 @@ nohup python -m vllm.entrypoints.openai.api_server \
 > vllm.log 2>&1 &
 ```
    
-3. Coding agent model (for invoking skills)
-Candidate models:
+3. Coding agent model (for invoking skills). Candidate models:
 - Gemma-4-31B-it (see: `https://huggingface.co/RedHatAI/gemma-4-31B-it-NVFP4`)
 ```
 #################################
