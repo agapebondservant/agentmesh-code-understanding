@@ -15,7 +15,7 @@ minio:
 dataGeneration:
   image:
     registry: ""
-    name: data-generation
+    name: ""
     title: "Agent Mesh - Data Generation"
     version: latest
   notebook:
@@ -24,8 +24,17 @@ dataGeneration:
 graphrag:
   image:
     registry: ""
-    name: graphrag
-    title: "Agent Mesh - GraphRAG"
+    name: ""
+    title: "Agent Mesh - GraphRAG Indexing"
+    version: latest
+  notebook:
+    name: graphrag-indexing
+
+analysis:
+  image:
+    registry: ""
+    name: ""
+    title: "Agent Mesh - Analysis"
     version: latest
   notebook:
     name: graphrag-analysis

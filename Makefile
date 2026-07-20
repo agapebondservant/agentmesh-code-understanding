@@ -15,6 +15,16 @@ install:
 		--set repoUrl="$(GIT_REPO_URL)" \
 		--set minio.rootUser="$$AWS_ACCESS_KEY_ID" \
 		--set minio.rootPassword="$$AWS_SECRET_ACCESS_KEY"
+		--set dataGeneration.image.registry="$$KFP_IMAGE_REGISTRY" \
+		--set dataGeneration.image.name="$$KFP_DATA_GENERATION_BASE_IMAGE_NAME" \
+		--set dataGeneration.image.version="$$KFP_DATA_GENERATION_BASE_IMAGE_VERSION" \
+		--set graphrag.image.registry="$$KFP_IMAGE_REGISTRY" \
+		--set graphrag.image.name="$$KFP_INDEXING_BASE_IMAGE_NAME" \
+		--set graphrag.image.version="$$KFP_INDEXING_BASE_IMAGE_VERSION" \
+		--set analysis.image.registry="$$KFP_IMAGE_REGISTRY" \
+		--set analysis.image.name="$$KFP_ANALYSIS_BASE_IMAGE_NAME" \
+		--set analysis.image.version="$$KFP_ANALYSIS_BASE_IMAGE_VERSION"
+
 
 run-pipelines:
 	set -a && . $(ENV_FILE) && set +a && \
