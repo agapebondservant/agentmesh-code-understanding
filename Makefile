@@ -1,4 +1,4 @@
-ENV_FILE ?= workflows/examples/code_understanding/.env
+ENV_FILE ?= .env
 GIT_REPO_URL := $(shell git remote get-url origin 2>/dev/null | sed 's|^git@\([^:]*\):\(.*\)$$|https://\1/\2|')
 
 install:

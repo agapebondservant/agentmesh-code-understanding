@@ -5,11 +5,12 @@ Contents
 - [ ] [Overview](#overview)
 - [ ] [Problem statement](#problem-statement)
   - [ ] [Agent Mesh for Software Modernization - Code Understanding](#agent-mesh-for-software-modernization---code-understanding)
-    - [ ] [Data Generation](#data-generation)
-    - [ ] [Data Indexing](#data-indexing)
-    - [ ] [Data Analysis](#data-analysis)
+    - [ ] [1. Data Generation](#1-data-generation)
+    - [ ] [2. Data Indexing](#2-data-indexing)
+    - [ ] [3. Data Analysis](#3-data-analysis)
 - [ ] [Required Software / Tested with](#tested-with)
-- [ ] [Installing the Agent Mesh for SW - Code Understanding](#installing-the-agent-mesh-for-sw---code-understanding)
+- [ ] [Installing the Code Understanding Workflow](#installing-the-code-understanding-workflow)
+  - [ ] [Preparing the Environment](#preparing-the-environment)
   - [ ] [Installing via Makefile](#installing-via-makefile)
 - [ ] [Running the Code Understanding Workflow](#running-the-code-understanding-workflow)
 
@@ -88,6 +89,10 @@ code and generate assets for the refactoring catalog, including a migration plan
 - Helm CLI (`helm`)
 
 ## Installing the Code Understanding Workflow
+
+### Preparing the Environment
+
+1. Create an environment variables file `.env` using `workflows/.env-template` as a guide.
 
 ### Installing via Makefile
 1. Run the Makefile: `make install`
