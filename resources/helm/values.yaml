@@ -1,0 +1,31 @@
+namespace: demo
+kfpHost: ""
+
+repoUrl: ""
+repoRef: main
+
+version: latest
+
+minio:
+  rootUser: ""
+  rootPassword: ""
+  service: minio-service
+  bucket: demo
+
+dataGeneration:
+  image:
+    registry: ""
+    name: data-generation
+    title: "Agent Mesh - Data Generation"
+    version: latest
+  notebook:
+    name: data-generation
+
+graphrag:
+  image:
+    registry: ""
+    name: graphrag
+    title: "Agent Mesh - GraphRAG"
+    version: latest
+  notebook:
+    name: graphrag-analysis

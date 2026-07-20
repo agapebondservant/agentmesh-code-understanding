@@ -1,0 +1,217 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespace}}
+  labels:
+    opendatahub.io/dashboard: "true"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: datagen-storage
+  namespace: {{ .Values.namespace}}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: graphrag-storage
+  namespace: {{ .Values.namespace}}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: custom-data-generation
+  namespace: redhat-ods-applications
+  labels:
+    app.kubernetes.io/created-by: "byon"
+    opendatahub.io/dashboard: "true"
+    opendatahub.io/notebook-image: "true"
+  annotations:
+    opendatahub.io/notebook-image-name: ""{{ .Values.dataGeneration.image.title}}""
+    opendatahub.io/notebook-image-url: "{{ .Values.dataGeneration.image.registry}}/{{ .Values.dataGeneration.image.name}}:{{ .Values.dataGeneration.image.version}}"
+    opendatahub.io/recommended-accelerators: '[]'
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+    - name: 'latest'
+      annotations:
+        opendatahub.io/notebook-python-dependencies: '[]'
+        opendatahub.io/notebook-software: '[]'
+        opendatahub.io/imported-from: {{ .Values.dataGeneration.image.registry}}/{{ .Values.dataGeneration.image.name}}:{{ .Values.dataGeneration.image.version}}
+      from:
+        kind: DockerImage
+        name: '{{ .Values.dataGeneration.image.registry}}/{{ .Values.dataGeneration.image.name}}:{{ .Values.dataGeneration.image.version}}'
+      importPolicy:
+        importMode: Legacy
+      referencePolicy:
+        type: Source
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: custom-graphrag
+  namespace: redhat-ods-applications
+  labels:
+    app.kubernetes.io/created-by: "byon"
+    opendatahub.io/dashboard: "true"
+    opendatahub.io/notebook-image: "true"
+  annotations:
+    opendatahub.io/notebook-image-name: "{{ .Values.graphrag.image.title}}"
+    opendatahub.io/notebook-image-url: "{{ .Values.graphrag.image.registry}}/{{ .Values.graphrag.image.name}}:{{ .Values.graphrag.image.version}}"
+    opendatahub.io/recommended-accelerators: '[]'
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+    - name: 'latest'
+      annotations:
+        opendatahub.io/notebook-python-dependencies: '[]'
+        opendatahub.io/notebook-software: '[]'
+        opendatahub.io/imported-from: {{ .Values.graphrag.image.registry}}/{{ .Values.graphrag.image.name}}:{{ .Values.graphrag.image.version}}
+      from:
+        kind: DockerImage
+        name: '{{ .Values.graphrag.image.registry}}/{{ .Values.graphrag.image.name}}:{{ .Values.graphrag.image.version}}'
+      importPolicy:
+        importMode: Legacy
+      referencePolicy:
+        type: Source
+---
+apiVersion: kubeflow.org/v1
+kind: Notebook
+metadata:
+  annotations:
+    notebooks.opendatahub.io/inject-auth: "true"
+    notebooks.opendatahub.io/last-image-selection: "{{ .Values.dataGeneration.image.name}}:{{ .Values.version}}"
+    opendatahub.io/workbench-image-namespace: {{ .Values.namespace }}
+    opendatahub.io/image-display-name: Agent Mesh - Data Generation
+    opendatahub.io/hardware-profile-name: default-profile
+    opendatahub.io/hardware-profile-namespace: redhat-ods-applications
+  name: {{ .Values.dataGeneration.notebook.name}}
+  namespace: {{ .Values.namespace}}
+  labels:
+    opendatahub.io/odh-managed: "true"
+    opendatahub.io/dashboard: "true"
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: git-clone
+          image: {{ .Values.dataGeneration.image.registry}}/{{ .Values.dataGeneration.image.name}}:{{ .Values.dataGeneration.image.version}}
+          command:
+            - sh
+            - -c
+            - |
+              git config --global --add safe.directory /opt/app-root/src                                                                      
+              git -C /opt/app-root/src init                                                                                                   
+              git -C /opt/app-root/src remote add origin "{{ .Values.repoUrl }}" 2>/dev/null || true                                          
+              git -C /opt/app-root/src fetch origin "{{ .Values.repoRef }}"                                                         
+              git -C /opt/app-root/src reset --hard FETCH_HEAD
+      containers:
+        - name: {{ .Values.dataGeneration.image.name}}
+          image: {{ .Values.dataGeneration.image.registry}}/{{ .Values.dataGeneration.image.name}}:{{ .Values.dataGeneration.image.version}}
+          workingDir: /opt/app-root/src
+          resources:
+            limits:
+              cpu: "6"
+              memory: 24Gi
+            requests:
+              cpu: "3"
+              memory: 24Gi
+          volumeMounts:
+            - name: workspace-volume
+              mountPath: /opt/app-root/src
+          envFrom:
+            - secretRef:
+                name: code-understanding-env
+          env:
+            - name: NOTEBOOK_ARGS
+              value: >-
+                --ServerApp.port=8888
+                --ServerApp.token=''
+                --ServerApp.password=''
+                --ServerApp.base_url=/notebook/{{ .Values.namespace }}/{{ .Values.dataGeneration.image.name }}
+                --ServerApp.quit_button=False
+            - name: JUPYTER_IMAGE
+              value: "{{ .Values.dataGeneration.image.registry}}/{{ .Values.dataGeneration.image.name}}:{{ .Values.dataGeneration.image.version}}"
+      volumes:
+        - name: datagen-wb-volume
+          persistentVolumeClaim:
+            claimName: datagen-storage
+---
+apiVersion: kubeflow.org/v1
+kind: Notebook
+metadata:
+  annotations:
+    notebooks.opendatahub.io/inject-auth: "true"
+    notebooks.opendatahub.io/last-image-selection: "{{ .Values.graphrag.image.name}}:{{ .Values.graphrag.image.version}}"
+    opendatahub.io/workbench-image-namespace: {{ .Values.namespace }}
+    opendatahub.io/image-display-name: Agent Mesh - GraphRAG Analysis
+    opendatahub.io/hardware-profile-name: default-profile
+    opendatahub.io/hardware-profile-namespace: redhat-ods-applications
+  name: {{ .Values.graphrag.notebook.name}}
+  namespace: {{ .Values.namespace}}
+  labels:
+    opendatahub.io/odh-managed: "true"
+    opendatahub.io/dashboard: "true"
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: git-clone
+          image: {{ .Values.graphrag.image.registry}}/{{ .Values.graphrag.image.name}}:{{ .Values.graphrag.image.version}}
+          command:
+            - sh
+            - -c
+            - |
+              git config --global --add safe.directory /opt/app-root/src                                                                      
+              git -C /opt/app-root/src init                                                                                                   
+              git -C /opt/app-root/src remote add origin "{{ .Values.repoUrl }}" 2>/dev/null || true                                          
+              git -C /opt/app-root/src fetch origin "{{ .Values.repoRef }}"                                                         
+              git -C /opt/app-root/src reset --hard FETCH_HEAD
+      containers:
+        - name: {{ .Values.graphrag.image.name}}
+          image: {{ .Values.graphrag.image.registry}}/{{ .Values.graphrag.image.name}}:{{ .Values.graphrag.image.version}}
+          workingDir: /opt/app-root/src
+          resources:
+            limits:
+              cpu: "6"
+              memory: 24Gi
+            requests:
+              cpu: "3"
+              memory: 24Gi
+          volumeMounts:
+            - name: workspace-volume
+              mountPath: /opt/app-root/src
+          envFrom:
+            - secretRef:
+                name: code-understanding-env
+          env:
+            - name: NOTEBOOK_ARGS
+              value: >-
+                --ServerApp.port=8888
+                --ServerApp.token=''
+                --ServerApp.password=''
+                --ServerApp.base_url=/notebook/{{ .Values.namespace }}/{{ .Values.graphrag.image.name }}
+                --ServerApp.quit_button=False
+            - name: JUPYTER_IMAGE
+              value: "{{ .Values.graphrag.image.registry}}/{{ .Values.graphrag.image.name}}:{{ .Values.graphrag.image.version}}"
+      volumes:
+        - name: graphrag-wb-volume
+          persistentVolumeClaim:
+            claimName: graphrag-storage
+
+
