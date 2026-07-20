@@ -6,8 +6,8 @@ install:
 		(echo "ERROR: .env file not found ($(ENV_FILE))"; exit 1)
 	set -a && . $(ENV_FILE) && set +a && \
 	helm upgrade --install agent-mesh-for-sw resources/helm \
+		--create-namespace \
 		--set namespace="$$KFP_NAMESPACE" \
-		--set kfpHost="$$KFP_HOST" \
 		--set repoUrl="$(GIT_REPO_URL)" \
 		--set minio.rootUser="$$AWS_ACCESS_KEY_ID" \
 		--set minio.rootPassword="$$AWS_SECRET_ACCESS_KEY"

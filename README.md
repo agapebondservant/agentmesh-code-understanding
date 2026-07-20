@@ -5,6 +5,7 @@ Contents
 - [ ] [Overview](#overview)
 - [ ] [Required Software / Tested with](#tested-with)
 - [ ] [Installing the Code Understanding Workflow](#installing-the-code-understanding-workflow)
+  - [ ] [Integrating the Models](#integrating-the-models)
   - [ ] [Preparing the Environment](#preparing-the-environment)
   - [ ] [Installing via Makefile](#installing-via-makefile)
 - [ ] [Running the Code Understanding Workflow](#running-the-code-understanding-workflow)
@@ -41,6 +42,72 @@ Understanding** and **Code Migration**. This repository demonstrates the **Code 
 - Helm CLI (`helm`)
 
 ## Installing the Code Understanding Workflow
+
+### Integrating the Models
+Ensure that you have access to OpenAI-compatible endpoints for the 
+following models:
+
+1. GraphRAG "chat" model 
+(see <a href="https://microsoft.github.io/graphrag/config/yaml" target="_blank">docs</a>)
+    
+Candidate models: 
+- gpt-oss-120b (see: `https://huggingface.co/RedHatAI/gpt-oss-120b`)
+```
+#################################
+# Sample vLLM Deployment on H100:
+#################################
+export HF_TOKEN=<your-huggingface-token>
+export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
+pip install vllm==0.19.0 mistral-common==1.9.1 tqdm==4.67.3 jupyter==1.1.1 hf_transfer==0.1.9 transformers==4.55.2
+nohup python3 -m vllm.entrypoints.openai.api_server \
+    --model RedHatAI/gpt-oss-120b \ 
+    --enable-auto-tool-choice \
+    --tool-call-parser openai \                                                                                    
+    --max-model-len 128000 \
+    > vllm.log 2>&1 &
+```
+
+2. GraphRAG "embedding" model 
+(see <a href="https://microsoft.github.io/graphrag/config/yaml" target="_blank">docs</a>)
+
+Candidate models:
+- e5-mistral-7b-instruct (see: `https://huggingface.co/intfloat/e5-mistral-7b-instruct`)
+```
+#################################
+# Sample vLLM Deployment on L40S:
+#################################
+export HF_TOKEN=<your-huggingface-token>
+pip install vllm==0.19.0 mistral-common==1.9.1 tqdm==4.67.3 jupyter==1.1.1 hf_transfer==0.1.9 transformers==4.55.2
+nohup python -m vllm.entrypoints.openai.api_server \
+--model=intfloat/e5-mistral-7b-instruct \                                                                  
+--runner pooling \  # or --task=embed for older vllm                                                                                       
+--dtype float16 
+> vllm.log 2>&1 &
+```
+   
+3. Coding agent model (for invoking skills)
+Candidate models:
+- Gemma-4-31B-it (see: `https://huggingface.co/RedHatAI/gemma-4-31B-it-NVFP4`)
+```
+#################################
+# Sample vLLM Deployment on H200:
+#################################
+pip install vllm==0.19.0 tqdm==4.67.3 jupyter==1.1.1 hf_transfer==0.1.9 huggingface-hub "transformers<5.0.0,>=4.56.0"
+pip install huggingface-hub==1.14.0 transformers==5.8.0
+wget https://huggingface.co/RedHatAI/gemma-4-31B-it-NVFP4/blob/main/chat_template.jinja
+nohup python3 -m vllm.entrypoints.openai.api_server \
+     --model RedHatAI/gemma-4-31B-it-NVFP4 \
+     --quantization fp8 \
+     --kv-cache-dtype fp8 \
+     --enable-auto-tool-choice \
+     --reasoning-parser gemma4 \
+     --tool-call-parser gemma4 \
+     --chat-template chat_template.jinja \
+     --gpu-memory-utilization 0.90 \
+     --max-model-len 262144 \
+      > vllm.log 2>&1 &
+```
+- gpt-oss-120b (see: (a) above)
 
 ### Preparing the Environment
 
