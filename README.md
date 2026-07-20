@@ -96,7 +96,7 @@ code and generate assets for the refactoring catalog, including a migration plan
 1. To run the **Code Understanding** pipeline for a single repository, run:
 ```make run-pipelines ARGS="--single"```
 
-2. To run the **Code Understanding** pipeline for a single repository, 
+2. To run the **Code Understanding** pipeline for multiple repositories, 
    perform the following steps:
     - Update `assets/repos/repo_list.json` with the list of repositories to 
       be processed.
