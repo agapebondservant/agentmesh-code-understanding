@@ -9,8 +9,7 @@
 #   ./run_pipelines.sh --upload-aggregated  # upload aggregated pipeline template to KFP (no run)
 #
 # Environment variables:
-#   KFP_HOST              Kubeflow Pipelines endpoint
-#   KFP_NAMESPACE         Kubernetes namespace
+#   KFP_NAMESPACE         Kubernetes namespace (KFP_HOST is derived from this)
 #   KFP_IMAGE_REGISTRY    Image registry that hosts pipeline images (example: quay.io)
 #   TARGET_PATH           Output path from data generation, used as codebase input for indexing (default: target)
 #   GRAPHRAG_SOURCE_PATH  GraphRAG source path for indexing and analysis (default: graph_rag_app/source)
@@ -29,22 +28,19 @@ Options:
   -h, --help          Show this help message
 
 Environment variables:
-  KFP_HOST              Kubeflow Pipelines endpoint (required)
-  KFP_NAMESPACE         Kubernetes namespace (required)
+  KFP_NAMESPACE         Kubernetes namespace, used to derive KFP_HOST (required)
   KFP_IMAGE_REGISTRY    Image registry that hosts pipeline images (required)
   KFP_DATA_GENERATION_OUTPUT_PATH  Output path from data generation (default: target)
   KFP_DATA_INDEXING_OUTPUT_PATH    GraphRAG source path for indexing and analysis (default: graph_rag_app/source)
 EOF
 }
 
-if [[ -z "${KFP_HOST:-}" ]]; then
-    echo "Error: KFP_HOST must be set and non-empty." >&2
-    exit 1
-fi
 if [[ -z "${KFP_NAMESPACE:-}" ]]; then
     echo "Error: KFP_NAMESPACE must be set and non-empty." >&2
     exit 1
 fi
+
+KFP_HOST="http://ds-pipeline-dspa.${KFP_NAMESPACE}.svc.cluster.local:8888"
 if [[ -z "${KFP_IMAGE_REGISTRY}" ]]; then
     echo "Error: KFP_IMAGE_REGISTRY must be set and non-empty." >&2
     exit 1
