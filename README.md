@@ -87,7 +87,7 @@ code and generate assets for the refactoring catalog, including a migration plan
 - OpenShift CLI (`oc`)
 - Helm CLI (`helm`)
 
-## Installing the Agent Mesh for SW - Code Understanding
+## Installing the Code Understanding Workflow
 
 ### Installing via Makefile
 1. Run the Makefile: `make install`
