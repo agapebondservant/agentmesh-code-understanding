@@ -5,6 +5,10 @@ install:
 	oc create secret generic code-understanding-env --from-env-file $(ENV_FILE) || \
 		(echo "ERROR: .env file not found ($(ENV_FILE))"; exit 1)
 	set -a && . $(ENV_FILE) && set +a && \
+    oc create secret generic git-credentials \
+    --from-literal=GIT_USERNAME='$(GIT_USERNAME)' \
+    --from-literal=GIT_TOKEN='$(GIT_TOKEN)' \
+    -n $(KFP_NAMESPACE) --dry-run=client -o yaml | oc apply -f - && \
 	helm upgrade --install agent-mesh-for-sw resources/helm \
 		--create-namespace \
 		--set namespace="$$KFP_NAMESPACE" \
