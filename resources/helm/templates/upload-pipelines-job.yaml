@@ -26,6 +26,9 @@ spec:
                 ELAPSED=$((ELAPSED + 5))
               done
               echo "KFP is accessible at ${KFP_HOST}"
+          env:
+            - name: KFP_HOST
+              value: "http://ds-pipeline-dspa.{{ .Values.namespace }}.svc.cluster.local:8888"
           envFrom:
             - secretRef:
                 name: code-understanding-env
@@ -44,6 +47,9 @@ spec:
               git -C /opt/app-root/src reset --hard FETCH_HEAD
               workflows/examples/code_understanding/run_pipelines.sh --upload-single --upload-aggregated
           workingDir: /opt/app-root/src
+          env:
+            - name: KFP_HOST
+              value: "http://ds-pipeline-dspa.{{ .Values.namespace }}.svc.cluster.local:8888"
           envFrom:
             - secretRef:
                 name: code-understanding-env
