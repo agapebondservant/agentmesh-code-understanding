@@ -8,10 +8,10 @@ Contents
     - [ ] [Data Generation](#data-generation)
     - [ ] [Data Indexing](#data-indexing)
     - [ ] [Data Analysis](#data-analysis)
-  - [ ] [Required Software / Tested with](#tested-with)
-  - [ ] [Installing the Agent Mesh for SW - Code Understanding](#installing-the-agent-mesh-for-sw---code-understanding)
-    - [ ] [Installing via Makefile](#installing-via-makefile)
-  - [ ] [Running the Code Understanding Workflow](#running-the-code-understanding-workflow)
+- [ ] [Required Software / Tested with](#tested-with)
+- [ ] [Installing the Agent Mesh for SW - Code Understanding](#installing-the-agent-mesh-for-sw---code-understanding)
+  - [ ] [Installing via Makefile](#installing-via-makefile)
+- [ ] [Running the Code Understanding Workflow](#running-the-code-understanding-workflow)
 
 <a id="overview"></a>
 ## 🧭 Overview
@@ -74,7 +74,7 @@ It includes both canned and adhoc queries that can be used to explore the
 code and generate assets for the refactoring catalog, including a migration plan.
 
 <a id="tested-with"></a>
-### Required Software / Tested with
+## Required Software / Tested with
 
 - Red Hat OpenShift 4.18+
 - Red Hat OpenShift AI 2.22+
@@ -87,12 +87,12 @@ code and generate assets for the refactoring catalog, including a migration plan
 - OpenShift CLI (`oc`)
 - Helm CLI (`helm`)
 
-### Installing the Agent Mesh for SW - Code Understanding
+## Installing the Agent Mesh for SW - Code Understanding
 
-#### Installing via Makefile
+### Installing via Makefile
 1. Run the Makefile: `make install`
 
-### Running the Code Understanding Workflow
+## Running the Code Understanding Workflow
 1. To run the **Code Understanding** pipeline for a single repository, run:
 ```make run-pipelines ARGS="--single"```
 
