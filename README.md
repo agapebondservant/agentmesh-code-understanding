@@ -8,11 +8,10 @@ Contents
   - [ ] [Preparing the Environment](#preparing-the-environment)
   - [ ] [Installing via Makefile](#installing-via-makefile)
 - [ ] [Running the Code Understanding Workflow](#running-the-code-understanding-workflow)
-- [ ] [Problem statement](#problem-statement)
-  - [ ] [Agent Mesh for Software Modernization - Code Understanding](#agent-mesh-for-software-modernization---code-understanding)
-    - [ ] [1. Data Generation](#1-data-generation)
-    - [ ] [2. Data Indexing](#2-data-indexing)
-    - [ ] [3. Data Analysis](#3-data-analysis)
+- [ ] [More About the Code Understanding Workflow](#more-about-the-code-understanding-workflow)
+  - [ ] [1. Data Generation](#1-data-generation)
+  - [ ] [2. Data Indexing](#2-data-indexing)
+  - [ ] [3. Data Analysis](#3-data-analysis)
 
 <a id="overview"></a>
 ## 🧭 Overview
@@ -23,6 +22,9 @@ Contents
 This demonstrates the **Code Understanding** phase of the Agent Mesh for Software Engineering, a framework pattern 
 for continuous legacy code which uses a federated, multi-harness, multi-agent 
 system (MAS) to support iterative agent-driven development for brownfield applications.
+
+(NOTE: The Agent Mesh consists of two main **workflows**: **Code 
+Understanding** and **Code Migration**. This repository demonstrates the **Code Understanding** workflow.)
 
 <a id="tested-with"></a>
 ## Required Software / Tested with
@@ -58,28 +60,9 @@ system (MAS) to support iterative agent-driven development for brownfield applic
     - Run the following command:
    ```make run-pipelines ARGS="--aggregated"```
 
-## Problem statement
-
-Legacy enterprise codebases are typically characterized by the following:
-
-- Incomplete, inaccurate, and/or missing documentation and test coverage
-- Lack of understanding of implicit business logic (resulting in high upfront “code comprehension tax”)
-- Extensive technical debt, including vulnerable dependencies, spaghetti code, quiet bugs, etc
-- Niche and/or legacy languages with little or no benchmarking standards and ill-matched code quality metrics
-
-In turn, modern approaches for handling this involve a hybrid of one or more methods: coding agent-only, direct translation, AST / CFG based refactoring, 
-domain-specific finetuning, static rules engines, manual review, etc. However, as of this writing, there is no one-size-fits-all approach for legacy refactoring. Every paradigm has its pros and cons. 
-
-An agent mesh adopts a loosely coupled integration pattern that can wrap different agents, 
-agent harnesses, and tools. It can address some of these refactoring challenges by distributing responsibilities across specialized agents and enforcing [iterative development](https://arxiv.org/html/2510.22254v2) with explicit artifacts and mixed human-AI gates.
-
-### Agent Mesh for Software Modernization - Code Understanding
+## More About the Code Understanding Workflow
 
 ![High Level Overview](code_understanding.jpg)
-
-The Agent Mesh consists of two main **workflows**: **Code Understanding** and 
-**Code Migration**. This repository demonstrates the 
-**Code Understanding** workflow. 
 
 The **Code Understanding** workflow is the initial **iteration** in the 
 process. It is a **tool-driven workflow** which generates artifacts for the 
