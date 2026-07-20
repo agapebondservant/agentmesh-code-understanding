@@ -54,20 +54,20 @@ etc) to build the **migration plan** for the **Code Migration** workflow.
 
 There are three main sub-workflows in the **Code Understanding** workflow:
 
-#### Data Generation
+#### 1. Data Generation
 
 The **Data Generation** sub-workflow is used to generate metadata that will be 
 used for GraphRAG-based indexing. For each relevant file in the original 
 codebase, it will generate a `.txt` version of the file and a new metadata 
 file. This enriched fileset will then be passed as input to the **Data Indexing** workbench in the next step.
 
-#### Data Indexing
+#### 2. Data Indexing
 
 The **Data Indexing** sub-workflow is used to index the fileset from the 
 **Data Generation** step using GraphRAG. It will generate a graph-based 
 representation of the codebase that can be used for querying.
 
-#### Data Analysis
+#### 3. Data Analysis
 
 The **Data Analysis** workbench is used to query the generated GraphRAG index using the GraphRAG SDK.
 It includes both canned and adhoc queries that can be used to explore the 
