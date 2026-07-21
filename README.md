@@ -1,4 +1,4 @@
-# Agent Mesh for Software Modernization
+# Agent Mesh for Software Modernization - Code Understanding
 
 Contents
 ---
@@ -7,6 +7,7 @@ Contents
 - [ ] [Installing the Code Understanding Workflow](#installing-the-code-understanding-workflow)
   - [ ] [Integrating the Models](#integrating-the-models)
   - [ ] [Preparing the Environment](#preparing-the-environment)
+  - [ ] [(Optional) Building the Container Images](#optional-building-the-container-images)
   - [ ] [Installing via Makefile](#installing-via-makefile)
 - [ ] [Running the Code Understanding Workflow](#running-the-code-understanding-workflow)
 - [ ] [More About the Code Understanding Workflow](#more-about-the-code-understanding-workflow)
@@ -34,7 +35,7 @@ Understanding** and **Code Migration**. This repository demonstrates the **Code 
 - Red Hat OpenShift AI 2.22+
 - 1X NVIDIA H200 GPU, 1X NVIDIA H100 GPU, 1X NVIDIA L40S GPU
 - 8+ vCPUs / 24+ GiB RAM
-- MLflow [Installation](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/working_with_mlflow/installing-mlflow_mlflow)
+- MLflow (assumes Openshift AI 3.4+) [Installation](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/working_with_mlflow/installing-mlflow_mlflow)
 - Openshift AI Model Registry [Installation](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.25/html-single/enabling_the_model_registry_component/index)
 - Openshift AI Model Catalog [Installation](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html-single/working_with_the_model_catalog/index)
 - Openshift AI Pipelines [Installation](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.5/html/openshift_ai_tutorial_-_fraud_detection_example/setting-up-a-project-and-storage#enabling-ai-pipelines)
@@ -106,7 +107,10 @@ nohup python3 -m vllm.entrypoints.openai.api_server \
 
 ### Preparing the Environment
 
-1. Create an environment variables file `.env` using `workflows/.env-template` as a guide.
+1. Create an environment variables file `.env` using `.env-template` as a guide.
+
+### (Optional) Building the Container Images
+1. To build the container images, run the following: `make build-images`
 
 ### Installing via Makefile
 1. Run the Makefile: `make install`

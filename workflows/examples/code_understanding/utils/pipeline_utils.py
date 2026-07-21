@@ -24,7 +24,7 @@ def compile_and_exit(pipeline_fn):
     """Compiles pipeline_fn to YAML and exits if PIPELINE_COMPILE_ONLY is set."""
     if os.getenv("PIPELINE_COMPILE_ONLY"):
         from kfp import compiler
-        compiler.Compiler().compile(pipeline_fn, os.environ["PIPELINE_OUTPUT_YAML"])
+        compiler.Compiler().compile(pipeline_fn, os.environ.get("PIPELINE_OUTPUT_YAML", "compiled_pipeline.yaml"))
         raise SystemExit(0)
 
 

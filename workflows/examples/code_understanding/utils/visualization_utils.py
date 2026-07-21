@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 import networkx as nx
 import matplotlib.pyplot as plt
 from pyvis.network import Network
-from graphrag_utils import DependencyAnalyzer
+from utils.graphrag_utils import DependencyAnalyzer
 import traceback
 
 

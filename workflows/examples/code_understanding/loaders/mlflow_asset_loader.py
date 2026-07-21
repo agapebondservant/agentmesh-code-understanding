@@ -11,9 +11,20 @@ from .asset_loader import AssetLoader
 class MlFlowAssetLoader(AssetLoader):
     """Loads an asset from the MLflow artifacts registry."""
 
-    _EXPERIMENT_NAME = "/assets/code-understanding"
+    _EXPERIMENT_NAME = "/code-refactoring/assets"
+    _RUN_NAME = "code-understanding"
+
+    _SA_TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
     def __init__(self):
+
+        if not os.environ.get("MLFLOW_TRACKING_TOKEN") and os.path.exists(self._SA_TOKEN_PATH):
+
+            with open(self._SA_TOKEN_PATH) as f:
+
+                logging.info("Setting MLFLOW_TRACKING_TOKEN from Kubernetes service account token...")
+
+                os.environ["MLFLOW_TRACKING_TOKEN"] = f.read().strip()
 
         try:
 
@@ -106,7 +117,7 @@ class MlFlowAssetLoader(AssetLoader):
 
                 experiment = client.get_experiment(client.create_experiment(name=self._EXPERIMENT_NAME))
 
-            run = client.create_run(experiment.experiment_id)
+            run = client.create_run(experiment.experiment_id, run_name=self._RUN_NAME)
 
             client.log_artifacts(run.info.run_id, local_dir_path, artifact_path=upload_dir)
 
@@ -128,7 +139,7 @@ class MlFlowAssetLoader(AssetLoader):
 
                 experiment = client.get_experiment(client.create_experiment(name=self._EXPERIMENT_NAME))
 
-            with mlflow.start_run(experiment_id=experiment.experiment_id) as run:
+            with mlflow.start_run(experiment_id=experiment.experiment_id, run_name=self._RUN_NAME) as run:
 
                 if tags:
 
@@ -167,7 +178,7 @@ class MlFlowAssetLoader(AssetLoader):
 
                 experiment = client.get_experiment(client.create_experiment(name=self._EXPERIMENT_NAME))
 
-            run = client.create_run(experiment.experiment_id)
+            run = client.create_run(experiment.experiment_id, run_name=self._RUN_NAME)
 
             client.log_artifact(run.info.run_id, asset_file_path, artifact_path=upload_dir)
 

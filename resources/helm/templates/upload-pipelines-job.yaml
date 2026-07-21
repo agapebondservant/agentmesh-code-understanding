@@ -4,6 +4,9 @@ kind: Job
 metadata:
   name: upload-kubeflow-pipelines
   namespace: {{ .Values.namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   backoffLimit: 0
   template:
@@ -39,12 +42,16 @@ spec:
             - sh
             - -c
             - |
-              pip install --quiet kfp jupyter
+              pip install --quiet 'kfp>=2.0.0,<3.0.0' jupyter
               git config --global --add safe.directory /opt/app-root/src
               git -C /opt/app-root/src init
               git -C /opt/app-root/src remote add origin "{{ .Values.repoUrl }}" 2>/dev/null || true
               git -C /opt/app-root/src fetch origin "{{ .Values.repoRef }}"
               git -C /opt/app-root/src reset --hard FETCH_HEAD
+              if workflows/examples/code_understanding/pre_check_pipelines.sh; then
+                echo "Pipelines already exist, skipping upload."
+                exit 0
+              fi
               workflows/examples/code_understanding/run_pipelines.sh --upload-single --upload-aggregated
           workingDir: /opt/app-root/src
           env:
