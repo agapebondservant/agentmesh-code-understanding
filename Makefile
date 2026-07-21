@@ -2,6 +2,8 @@ ENV_FILE     ?= .env
 GIT_REPO_URL := $(shell git remote get-url origin 2>/dev/null | sed 's|^git@\([^:]*\):\(.*\)$$|https://\1/\2|')
 
 install:
+	set -a && . $(ENV_FILE) && set +a && \
+	helm template resources/helm -s templates/namespace.yaml --set namespace="$$KFP_NAMESPACE" | oc apply -f -
 	oc delete secret code-understanding-env --ignore-not-found=true
 	oc create secret generic code-understanding-env --from-env-file $(ENV_FILE) || \
 		(echo "ERROR: .env file not found ($(ENV_FILE))"; exit 1)
