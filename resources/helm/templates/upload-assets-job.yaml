@@ -25,7 +25,7 @@ spec:
               git -C /opt/app-root/src remote add origin "${REPO_URL}" 2>/dev/null || true
               git -C /opt/app-root/src fetch origin "${REPO_REF}"
               git -C /opt/app-root/src reset --hard FETCH_HEAD
-              export MLFLOW_TRACKING_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+              export MLFLOW_TRACKING_TOKEN=${MLFLOW_TRACKING_TOKEN:-$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)}
               python - <<'PYEOF'
               import os, logging, mlflow, requests
               from mlflow.tracking import MlflowClient
@@ -35,7 +35,7 @@ spec:
               EXPERIMENT_NAME = f"/{os.environ['MLFLOW_WORKSPACE']}/code-refactoring/assets"
               ASSETS_DIR = "workflows/examples/code_understanding/assets"
 
-              _token = open("/var/run/secrets/kubernetes.io/serviceaccount/token").read().strip()
+              _token = os.environ.get("MLFLOW_TRACKING_TOKEN") or open("/var/run/secrets/kubernetes.io/serviceaccount/token").read().strip()
               _orig_send = requests.Session.send
               def _send_with_forwarded_token(self, request, **kwargs):
                   request.headers["X-Forwarded-Access-Token"] = _token

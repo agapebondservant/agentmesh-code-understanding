@@ -14,7 +14,7 @@ install:
 	echo "==> Patching secret with dynamic values..." && \
 	oc patch secret code-understanding-env -n $$KFP_NAMESPACE \
 		--type=merge \
-		-p "{\"stringData\":{\"MLFLOW_NAMESPACE\":\"$$KFP_NAMESPACE\",\"MLFLOW_TRACKING_TOKEN\":\"$$(oc whoami --show-token)\"}}" && \
+		-p "{\"stringData\":{\"MLFLOW_NAMESPACE\":\"$$KFP_NAMESPACE\"}}" && \
 	\
 	echo "==> Applying git-credentials secret..." && \
 	oc create secret generic git-credentials \
@@ -25,12 +25,6 @@ install:
 	echo "==> Granting edit role to default service account..." && \
 	oc adm policy add-role-to-user edit -z default -n $$KFP_NAMESPACE && \
 	\
-	echo "==> Granting MLflow access to default service account..." && \
-	oc create rolebinding mlflow-sa-access \
-		--role=edit \
-		--serviceaccount=$$KFP_NAMESPACE:default \
-		-n redhat-ods-applications \
-		--dry-run=client -o yaml | oc apply -f - && \
 	\
 	echo "==> Running helm upgrade..." && \
 	helm upgrade --install agent-mesh-for-sw resources/helm \

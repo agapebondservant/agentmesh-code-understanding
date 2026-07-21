@@ -1,6 +1,7 @@
 import json
 import os
 import mlflow
+import requests
 from mlflow.tracking import MlflowClient
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -25,6 +26,18 @@ class MlFlowAssetLoader(AssetLoader):
                 logging.info("Setting MLFLOW_TRACKING_TOKEN from Kubernetes service account token...")
 
                 os.environ["MLFLOW_TRACKING_TOKEN"] = f.read().strip()
+
+        _token = os.environ.get("MLFLOW_TRACKING_TOKEN")
+
+        if _token:
+
+            _orig_send = requests.Session.send
+
+            def _send_with_forwarded_token(self, request, **kwargs):
+                request.headers["X-Forwarded-Access-Token"] = _token
+                return _orig_send(self, request, **kwargs)
+
+            requests.Session.send = _send_with_forwarded_token
 
         try:
 
