@@ -25,6 +25,9 @@ install:
 	echo "==> Granting edit role to default service account..." && \
 	oc adm policy add-role-to-user edit -z default -n $$KFP_NAMESPACE && \
 	\
+	echo "==> Granting MLflow access to default service account..." && \
+	oc adm groups add-users rhods-users system:serviceaccount:$$KFP_NAMESPACE:default && \
+	\
 	echo "==> Running helm upgrade..." && \
 	helm upgrade --install agent-mesh-for-sw resources/helm \
 		--create-namespace \
