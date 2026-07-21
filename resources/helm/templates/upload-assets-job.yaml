@@ -32,7 +32,7 @@ spec:
 
               logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
-              EXPERIMENT_NAME = "/code-refactoring/assets"
+              EXPERIMENT_NAME = f"/{os.environ['MLFLOW_WORKSPACE']}/code-refactoring/assets"
               ASSETS_DIR = "workflows/examples/code_understanding/assets"
 
               _token = open("/var/run/secrets/kubernetes.io/serviceaccount/token").read().strip()
@@ -94,6 +94,7 @@ spec:
           envFrom:
             - secretRef:
                 name: code-understanding-env
+                optional: true
           volumeMounts:
             - name: workspace
               mountPath: /opt/app-root/src

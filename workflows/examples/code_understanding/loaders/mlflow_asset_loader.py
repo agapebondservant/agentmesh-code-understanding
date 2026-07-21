@@ -11,7 +11,7 @@ from .asset_loader import AssetLoader
 class MlFlowAssetLoader(AssetLoader):
     """Loads an asset from the MLflow artifacts registry."""
 
-    _EXPERIMENT_NAME = "/code-refactoring/assets"
+    _EXPERIMENT_NAME = f"/{os.environ.get('MLFLOW_WORKSPACE', 'demo')}/code-refactoring/assets"
     _RUN_NAME = "code-understanding"
 
     _SA_TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
