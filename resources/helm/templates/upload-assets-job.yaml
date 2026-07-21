@@ -54,7 +54,7 @@ spec:
               experiment_id = _get_or_create_experiment(client)
               logging.info(f"Experiment: {EXPERIMENT_NAME} (id={experiment_id})")
 
-              __RUN_NAME = "code-understanding"
+              _RUN_NAME = "code-understanding"
 
               existing = client.search_runs(
                   experiment_ids=[experiment_id],
