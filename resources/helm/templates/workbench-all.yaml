@@ -115,15 +115,15 @@ spec:
               git -C /opt/app-root/src reset --hard FETCH_HEAD
       containers:
         - name: {{ .Values.dataGeneration.notebook.name}}
-          image: {{ .Values.dataGeneration.image.registry}}/{{ .Values.dataGeneration.image.name}}:{{ .Values.dataGeneration.image.version}}
+          image: {{ .Values.dataGeneration.image.name}}:{{ .Values.dataGeneration.image.version}}
           workingDir: /opt/app-root/src
           resources:
             limits:
-              cpu: "6"
-              memory: 24Gi
+              cpu: "2"
+              memory: 8Gi
             requests:
-              cpu: "3"
-              memory: 24Gi
+              cpu: "1"
+              memory: 4Gi
           volumeMounts:
             - name: workspace-volume
               mountPath: /opt/app-root/src
@@ -177,15 +177,15 @@ spec:
               git -C /opt/app-root/src reset --hard FETCH_HEAD
       containers:
         - name: {{ .Values.graphrag.notebook.name}}
-          image: {{ .Values.graphrag.image.registry}}/{{ .Values.graphrag.image.name}}:{{ .Values.graphrag.image.version}}
+          image: {{ .Values.graphrag.image.name}}:{{ .Values.graphrag.image.version}}
           workingDir: /opt/app-root/src
           resources:
             limits:
-              cpu: "6"
-              memory: 24Gi
+              cpu: "2"
+              memory: 8Gi
             requests:
-              cpu: "3"
-              memory: 24Gi
+              cpu: "1"
+              memory: 4Gi
           volumeMounts:
             - name: workspace-volume
               mountPath: /opt/app-root/src
