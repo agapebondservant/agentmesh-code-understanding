@@ -40,7 +40,7 @@ spec:
   lookupPolicy:
     local: true
   tags:
-    - name: 'latest'
+    - name: {{ .Values.dataGeneration.image.version}}
       annotations:
         opendatahub.io/notebook-python-dependencies: '[]'
         opendatahub.io/notebook-software: '[]'
@@ -70,7 +70,7 @@ spec:
   lookupPolicy:
     local: true
   tags:
-    - name: 'latest'
+    - name: {{ .Values.graphrag.image.version}}
       annotations:
         opendatahub.io/notebook-python-dependencies: '[]'
         opendatahub.io/notebook-software: '[]'
