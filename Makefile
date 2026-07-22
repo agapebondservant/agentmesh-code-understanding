@@ -29,10 +29,28 @@ install:
 		--set analysis.image.name="$$KFP_ANALYSIS_BASE_IMAGE_NAME" \
 		--set analysis.image.version="$$KFP_ANALYSIS_BASE_IMAGE_VERSION"
 	$(MAKE) apply-secrets
+	$(MAKE) update-notebook-images
 	@set -a && . $(ENV_FILE) && set +a && \
 	[ "$$ASSET_LOADER" = "mlflow" ] && \
 	echo "==> Preloading MLflow assets..." && \
 	$(MAKE) preload-mlflow-assets || true
+
+update-notebook-images:
+	@set -a && . $(ENV_FILE) && set +a && \
+	\
+	echo "==> Waiting for data-generation ImageStream to import..." && \
+	until oc get imagestreamtag custom-data-generation:$$KFP_DATA_GENERATION_BASE_IMAGE_VERSION -n redhat-ods-applications -o jsonpath='{.image.dockerImageReference}' 2>/dev/null | grep -q '@sha256:'; do sleep 5; done && \
+	DATAGEN_IMAGE=$$(oc get imagestreamtag custom-data-generation:$$KFP_DATA_GENERATION_BASE_IMAGE_VERSION -n redhat-ods-applications -o jsonpath='{.image.dockerImageReference}') && \
+	echo "==> Patching data-generation notebook image to $$DATAGEN_IMAGE..." && \
+	oc patch notebook data-generation -n $$KFP_NAMESPACE --type=json \
+		-p "[{\"op\":\"replace\",\"path\":\"/spec/template/spec/containers/0/image\",\"value\":\"$$DATAGEN_IMAGE\"}]" && \
+	\
+	echo "==> Waiting for graphrag ImageStream to import..." && \
+	until oc get imagestreamtag custom-graphrag:$$KFP_INDEXING_BASE_IMAGE_VERSION -n redhat-ods-applications -o jsonpath='{.image.dockerImageReference}' 2>/dev/null | grep -q '@sha256:'; do sleep 5; done && \
+	GRAPHRAG_IMAGE=$$(oc get imagestreamtag custom-graphrag:$$KFP_INDEXING_BASE_IMAGE_VERSION -n redhat-ods-applications -o jsonpath='{.image.dockerImageReference}') && \
+	echo "==> Patching graphrag-indexing notebook image to $$GRAPHRAG_IMAGE..." && \
+	oc patch notebook graphrag-indexing -n $$KFP_NAMESPACE --type=json \
+		-p "[{\"op\":\"replace\",\"path\":\"/spec/template/spec/containers/0/image\",\"value\":\"$$GRAPHRAG_IMAGE\"}]"
 
 apply-secrets:
 	@set -a && . $(ENV_FILE) && set +a && \

@@ -115,7 +115,7 @@ spec:
               git -C /opt/app-root/src reset --hard FETCH_HEAD
       containers:
         - name: {{ .Values.dataGeneration.notebook.name}}
-          image: image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/custom-data-generation:{{ .Values.dataGeneration.image.version}}
+          image: {{ .Values.dataGeneration.image.registry}}/{{ .Values.dataGeneration.image.name}}:{{ .Values.dataGeneration.image.version}}
           workingDir: /opt/app-root/src
           resources:
             limits:
@@ -177,7 +177,7 @@ spec:
               git -C /opt/app-root/src reset --hard FETCH_HEAD
       containers:
         - name: {{ .Values.graphrag.notebook.name}}
-          image: image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/custom-graphrag:{{ .Values.graphrag.image.version}}
+          image: {{ .Values.graphrag.image.registry}}/{{ .Values.graphrag.image.name}}:{{ .Values.graphrag.image.version}}
           workingDir: /opt/app-root/src
           resources:
             limits:
