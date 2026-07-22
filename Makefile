@@ -46,22 +46,22 @@ deploy-notebooks:
 	echo "==> Waiting for graphrag ImageStream to import..." && \
 	until oc get imagestreamtag custom-graphrag:$$KFP_INDEXING_BASE_IMAGE_VERSION -n redhat-ods-applications -o jsonpath='{.image.dockerImageReference}' 2>/dev/null | grep -q '@sha256:'; do sleep 5; done && \
 	GRAPHRAG_IMAGE=$$(oc get imagestreamtag custom-graphrag:$$KFP_INDEXING_BASE_IMAGE_VERSION -n redhat-ods-applications -o jsonpath='{.image.dockerImageReference}') && \
-	echo "  image: $$GRAPHRAG_IMAGE" && \
-	\
-	echo "==> Deploying notebooks..." && \
-	helm template agent-mesh-for-sw resources/helm \
-		--set namespace="$$KFP_NAMESPACE" \
-		--set requester="$$(oc whoami)" \
-		--set repoUrl="$(GIT_REPO_URL)" \
-		--set dataGeneration.image.registry="$$KFP_IMAGE_REGISTRY" \
-		--set dataGeneration.image.name="$$KFP_DATA_GENERATION_BASE_IMAGE_NAME" \
-		--set dataGeneration.image.version="$$KFP_DATA_GENERATION_BASE_IMAGE_VERSION" \
-		--set dataGeneration.image.digestRef="$$DATAGEN_IMAGE" \
-		--set graphrag.image.registry="$$KFP_IMAGE_REGISTRY" \
-		--set graphrag.image.name="$$KFP_INDEXING_BASE_IMAGE_NAME" \
-		--set graphrag.image.version="$$KFP_INDEXING_BASE_IMAGE_VERSION" \
-		--set graphrag.image.digestRef="$$GRAPHRAG_IMAGE" \
-		-s templates/workbench-notebooks.yaml | oc apply -f -
+	echo "  image: $$GRAPHRAG_IMAGE" # && \
+# 	\
+# 	echo "==> Deploying notebooks..." && \
+# 	helm template agent-mesh-for-sw resources/helm \
+# 		--set namespace="$$KFP_NAMESPACE" \
+# 		--set requester="$$(oc whoami)" \
+# 		--set repoUrl="$(GIT_REPO_URL)" \
+# 		--set dataGeneration.image.registry="$$KFP_IMAGE_REGISTRY" \
+# 		--set dataGeneration.image.name="$$KFP_DATA_GENERATION_BASE_IMAGE_NAME" \
+# 		--set dataGeneration.image.version="$$KFP_DATA_GENERATION_BASE_IMAGE_VERSION" \
+# 		--set dataGeneration.image.digestRef="$$DATAGEN_IMAGE" \
+# 		--set graphrag.image.registry="$$KFP_IMAGE_REGISTRY" \
+# 		--set graphrag.image.name="$$KFP_INDEXING_BASE_IMAGE_NAME" \
+# 		--set graphrag.image.version="$$KFP_INDEXING_BASE_IMAGE_VERSION" \
+# 		--set graphrag.image.digestRef="$$GRAPHRAG_IMAGE" \
+# 		-s templates/workbench-notebooks.yaml | oc apply -f -
 
 apply-secrets:
 	@set -a && . $(ENV_FILE) && set +a && \
