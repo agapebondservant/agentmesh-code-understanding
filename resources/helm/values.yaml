@@ -19,6 +19,7 @@ dataGeneration:
     name: ""
     title: "Agent Mesh - Data Generation"
     version: latest
+    digestRef: ""
   notebook:
     name: data-generation
 
@@ -28,6 +29,7 @@ graphrag:
     name: ""
     title: "Agent Mesh - GraphRAG Indexing"
     version: latest
+    digestRef: ""
   notebook:
     name: graphrag-indexing
 
