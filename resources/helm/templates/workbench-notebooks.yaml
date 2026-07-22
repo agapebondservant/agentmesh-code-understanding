@@ -1,3 +1,4 @@
+{{- if .Values.deployNotebooks }}
 {{- $datagen_image := .Values.dataGeneration.image.digestRef | default (printf "%s/%s:%s" .Values.dataGeneration.image.registry .Values.dataGeneration.image.name .Values.dataGeneration.image.version) }}
 {{- $graphrag_image := .Values.graphrag.image.digestRef | default (printf "%s/%s:%s" .Values.graphrag.image.registry .Values.graphrag.image.name .Values.graphrag.image.version) }}
 ---
@@ -124,3 +125,4 @@ spec:
         - name: graphrag-wb-volume
           persistentVolumeClaim:
             claimName: graphrag-storage
+{{- end }}

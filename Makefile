@@ -48,6 +48,7 @@ deploy-notebooks:
 	echo "  image: $$GRAPHRAG_IMAGE" && \
 	\
 	echo "==> Deploying notebooks..." && \
+	sleep 10 && \
 	helm template agent-mesh-for-sw resources/helm \
 		--set namespace="$$KFP_NAMESPACE" \
 		--set requester="$$(oc whoami)" \
@@ -60,7 +61,8 @@ deploy-notebooks:
 		--set graphrag.image.name="$$KFP_INDEXING_BASE_IMAGE_NAME" \
 		--set graphrag.image.version="$$KFP_INDEXING_BASE_IMAGE_VERSION" \
 		--set graphrag.image.digestRef="$$GRAPHRAG_IMAGE" \
-		-s workbench-notebooks.yaml | oc apply -f -
+		--set deployNotebooks=true \
+		-s templates/workbench-notebooks.yaml | oc apply -f -
 
 apply-secrets:
 	@set -a && . $(ENV_FILE) && set +a && \
