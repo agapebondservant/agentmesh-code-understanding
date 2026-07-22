@@ -40,7 +40,10 @@ spec:
                   experiment = client.get_experiment_by_name(EXPERIMENT_NAME)
                   logging.info(f"get_experiment_by_name('{EXPERIMENT_NAME}'): {experiment}")
                   if experiment:
-                      if experiment.lifecycle_stage != "active":
+                      if experiment.lifecycle_stage == "deleted":
+                          logging.info(f"Experiment '{EXPERIMENT_NAME}' is deleted. Restoring.")
+                          client.restore_experiment(experiment.experiment_id)
+                      elif experiment.lifecycle_stage != "active":
                           logging.info(f"Experiment '{EXPERIMENT_NAME}' is not active. Deleting and recreating.")
                           client.delete_experiment(experiment.experiment_id)
                       return experiment.experiment_id
