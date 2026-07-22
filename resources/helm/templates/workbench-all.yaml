@@ -90,7 +90,7 @@ metadata:
     notebooks.opendatahub.io/inject-auth: "true"
     notebooks.opendatahub.io/last-image-selection: "custom-data-generation:{{ .Values.dataGeneration.image.version}}"
     opendatahub.io/workbench-image-namespace: {{ .Values.namespace }}
-    opendatahub.io/image-display-name: Agent Mesh - Data Generation
+    opendatahub.io/image-display-name: {{ .Values.dataGeneration.image.title}}
     opendatahub.io/hardware-profile-name: default-profile
     opendatahub.io/hardware-profile-namespace: redhat-ods-applications
   name: {{ .Values.dataGeneration.notebook.name}}
@@ -152,7 +152,7 @@ metadata:
     notebooks.opendatahub.io/inject-auth: "true"
     notebooks.opendatahub.io/last-image-selection: "custom-graphrag:{{ .Values.graphrag.image.version}}"
     opendatahub.io/workbench-image-namespace: {{ .Values.namespace }}
-    opendatahub.io/image-display-name: Agent Mesh - GraphRAG Analysis
+    opendatahub.io/image-display-name: {{ .Values.graphrag.image.title}}
     opendatahub.io/hardware-profile-name: default-profile
     opendatahub.io/hardware-profile-namespace: redhat-ods-applications
   name: {{ .Values.graphrag.notebook.name}}
