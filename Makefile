@@ -10,6 +10,10 @@ install:
 	echo "==> Granting mlflow role to default user for MLflow workspace access ..." && \
 	oc adm policy add-role-to-user mlflow default -n $$KFP_NAMESPACE && \
 	\
+	echo "==> Creating notebook service accounts..." && \
+	oc create serviceaccount data-generation -n $$KFP_NAMESPACE --dry-run=client -o yaml | oc apply -f - && \
+	oc create serviceaccount graphrag-indexing -n $$KFP_NAMESPACE --dry-run=client -o yaml | oc apply -f - && \
+	\
 	echo "==> Running helm upgrade..." && \
 	helm upgrade --install agent-mesh-for-sw resources/helm \
 		--no-hooks \
