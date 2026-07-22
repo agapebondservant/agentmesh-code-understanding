@@ -32,7 +32,8 @@ install:
 	@set -a && . $(ENV_FILE) && set +a && \
 	[ "$$ASSET_LOADER" = "mlflow" ] && \
 	echo "==> Preloading MLflow assets..." && \
-	$(MAKE) preload-mlflow-assets || true
+	$(MAKE) preload-mlflow-assets || true && \
+	$(MAKE) deploy-notebooks || true
 
 deploy-notebooks:
 	@set -a && . $(ENV_FILE) && set +a && \
