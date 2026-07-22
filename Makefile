@@ -10,20 +10,20 @@ install:
 	echo "==> Recreating secret code-understanding-env..." && \
 	oc delete secret code-understanding-env -n $$KFP_NAMESPACE --ignore-not-found=true && \
 	oc create secret generic code-understanding-env --from-env-file $(ENV_FILE) -n $$KFP_NAMESPACE && \
-	\
-	echo "==> Patching secret with dynamic values..." && \
 	oc patch secret code-understanding-env -n $$KFP_NAMESPACE \
 		--type=merge \
 		-p "{\"stringData\":{\"MLFLOW_NAMESPACE\":\"$$KFP_NAMESPACE\",\"MLFLOW_TRACKING_TOKEN\":\"$$(oc whoami --show-token)\"}}" && \
+	oc annotate secret code-understanding-env -n $$KFP_NAMESPACE helm.sh/resource-policy=keep --overwrite && \
 	\
 	echo "==> Applying git-credentials secret..." && \
 	oc create secret generic git-credentials \
 		--from-literal=GIT_USERNAME="$$GIT_USERNAME" \
 		--from-literal=GIT_TOKEN="$$GIT_TOKEN" \
 		-n $$KFP_NAMESPACE --dry-run=client -o yaml | oc apply -f - && \
+	oc annotate secret git-credentials -n $$KFP_NAMESPACE helm.sh/resource-policy=keep --overwrite && \
 	\
-	echo "==> Granting mlflow role to current user for MLflow workspace access..." && \
-	oc adm policy add-role-to-user mlflow $$(oc whoami) -n $$KFP_NAMESPACE && \
+	echo "==> Granting mlflow role to default user for MLflow workspace access ..." && \
+	oc adm policy add-role-to-user mlflow default -n $$KFP_NAMESPACE && \
 	\
 	\
 	echo "==> Running helm upgrade..." && \
@@ -76,7 +76,11 @@ preload-mlflow-assets:
 	oc delete job upload-assets -n $$KFP_NAMESPACE --ignore-not-found=true && \
 	\
 	echo "==> Submitting upload-assets job..." && \
-	oc apply -f resources/helm/templates/upload-assets-job.yaml
+	helm template agent-mesh-for-sw resources/helm \
+		--set namespace="$$KFP_NAMESPACE" \
+		--set requester="$$(oc whoami)" \
+		--set repoUrl="$(GIT_REPO_URL)" \
+		-s templates/upload-assets-job.yaml | oc apply -n $$KFP_NAMESPACE -f -
 
 run-pipelines:
 	@set -a && . $(ENV_FILE) && set +a && \

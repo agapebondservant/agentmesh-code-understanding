@@ -89,7 +89,6 @@ spec:
           envFrom:
             - secretRef:
                 name: code-understanding-env
-                optional: true
           volumeMounts:
             - name: workspace
               mountPath: /opt/app-root/src
