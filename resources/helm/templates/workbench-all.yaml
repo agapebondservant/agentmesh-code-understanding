@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: datagen-storage
   namespace: {{ .Values.namespace}}
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   accessModes:
     - ReadWriteOnce
@@ -16,6 +18,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: graphrag-storage
   namespace: {{ .Values.namespace}}
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   accessModes:
     - ReadWriteOnce
