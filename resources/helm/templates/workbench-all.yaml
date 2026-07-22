@@ -1,5 +1,17 @@
 ---
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.dataGeneration.notebook.name }}
+  namespace: {{ .Values.namespace }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.graphrag.notebook.name }}
+  namespace: {{ .Values.namespace }}
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: datagen-storage
