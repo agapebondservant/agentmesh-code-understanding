@@ -40,16 +40,16 @@ deploy-notebooks:
 	\
 	echo "==> Waiting for data-generation ImageStream to import..." && \
 	until oc get imagestreamtag custom-data-generation:$$KFP_DATA_GENERATION_BASE_IMAGE_VERSION -n redhat-ods-applications -o jsonpath='{.image.dockerImageReference}' 2>/dev/null | grep -q '@sha256:'; do sleep 5; done && \
-	DATAGEN_IMAGE=$$(oc get imagestreamtag custom-data-generation:$$KFP_DATA_GENERATION_BASE_IMAGE_VERSION -n redhat-ods-applications -o jsonpath='{.image.dockerImageReference}') && \
+	DATAGEN_IMAGE="$$(oc get imagestream custom-data-generation -n redhat-ods-applications -o jsonpath='{.status.dockerImageRepository}'):$$KFP_DATA_GENERATION_BASE_IMAGE_VERSION" && \
 	echo "  image: $$DATAGEN_IMAGE" && \
 	\
 	echo "==> Waiting for graphrag ImageStream to import..." && \
 	until oc get imagestreamtag custom-graphrag:$$KFP_INDEXING_BASE_IMAGE_VERSION -n redhat-ods-applications -o jsonpath='{.image.dockerImageReference}' 2>/dev/null | grep -q '@sha256:'; do sleep 5; done && \
-	GRAPHRAG_IMAGE=$$(oc get imagestreamtag custom-graphrag:$$KFP_INDEXING_BASE_IMAGE_VERSION -n redhat-ods-applications -o jsonpath='{.image.dockerImageReference}') && \
+	GRAPHRAG_IMAGE="$$(oc get imagestream custom-graphrag -n redhat-ods-applications -o jsonpath='{.status.dockerImageRepository}'):$$KFP_INDEXING_BASE_IMAGE_VERSION" && \
 	echo "  image: $$GRAPHRAG_IMAGE" && \
 	\
 	echo "==> Deploying notebooks..." && \
-	sleep 10 && \
+	sleep 60 && \
 	helm template agent-mesh-for-sw resources/helm \
 		--set namespace="$$KFP_NAMESPACE" \
 		--set requester="$$(oc whoami)" \

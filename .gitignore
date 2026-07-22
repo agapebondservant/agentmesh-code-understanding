@@ -21,3 +21,5 @@ __pycache__
 .DS_Store
 .venv
 temp
+tmp1.txt
+tmp2.txt
