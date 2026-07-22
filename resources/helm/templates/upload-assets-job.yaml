@@ -19,13 +19,12 @@ spec:
             - sh
             - -c
             - |
-              pip install --quiet mlflow
+              pip install --quiet "mlflow[kubernetes]>=3.11"
               git config --global --add safe.directory /opt/app-root/src
               git -C /opt/app-root/src init
               git -C /opt/app-root/src remote add origin "${REPO_URL}" 2>/dev/null || true
               git -C /opt/app-root/src fetch origin "${REPO_REF}"
               git -C /opt/app-root/src reset --hard FETCH_HEAD
-              export MLFLOW_TRACKING_TOKEN=${MLFLOW_TRACKING_TOKEN:-$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)}
               python - <<'PYEOF'
               import os, logging, mlflow, requests
               from mlflow.tracking import MlflowClient
@@ -35,20 +34,16 @@ spec:
               EXPERIMENT_NAME = f"/{os.environ['MLFLOW_WORKSPACE']}/code-refactoring/assets"
               ASSETS_DIR = "workflows/examples/code_understanding/assets"
 
-              _token = os.environ.get("MLFLOW_TRACKING_TOKEN") or open("/var/run/secrets/kubernetes.io/serviceaccount/token").read().strip()
-              _orig_send = requests.Session.send
-              def _send_with_forwarded_token(self, request, **kwargs):
-                  request.headers["X-Forwarded-Access-Token"] = _token
-                  return _orig_send(self, request, **kwargs)
-              requests.Session.send = _send_with_forwarded_token
-
               def _get_or_create_experiment(client):
-                  results = client.search_experiments(filter_string=f"name = '{EXPERIMENT_NAME}'")
-                  if results:
-                      return results[0].experiment_id
+                  all_experiments = client.search_experiments()
+                  logging.info(f"All visible experiments: {[(e.name, e.experiment_id) for e in all_experiments]}")
+                  experiment = client.get_experiment_by_name(EXPERIMENT_NAME)
+                  logging.info(f"get_experiment_by_name('{EXPERIMENT_NAME}'): {experiment}")
+                  if experiment:
+                      return experiment.experiment_id
                   return client.create_experiment(name=EXPERIMENT_NAME)
 
-              mlflow.set_tracking_uri("https://mlflow.redhat-ods-applications.svc:8443")
+              mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "https://mlflow.redhat-ods-applications.svc:8443"))
               client = MlflowClient()
 
               experiment_id = _get_or_create_experiment(client)

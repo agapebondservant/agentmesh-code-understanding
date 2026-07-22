@@ -5,7 +5,7 @@ install:
 	@set -a && . $(ENV_FILE) && set +a && \
 	\
 	echo "==> Creating namespace $$KFP_NAMESPACE..." && \
-	sed "s|{{ .Values.namespace }}|$$KFP_NAMESPACE|g" resources/helm/templates/namespace.yaml | oc apply -f - && \
+	sed "s|{{ .Values.namespace }}|$$KFP_NAMESPACE|g; s|{{ .Values.requester }}|$$(oc whoami)|g" resources/helm/templates/namespace.yaml | oc apply -f - && \
 	\
 	echo "==> Recreating secret code-understanding-env..." && \
 	oc delete secret code-understanding-env -n $$KFP_NAMESPACE --ignore-not-found=true && \
@@ -14,7 +14,7 @@ install:
 	echo "==> Patching secret with dynamic values..." && \
 	oc patch secret code-understanding-env -n $$KFP_NAMESPACE \
 		--type=merge \
-		-p "{\"stringData\":{\"MLFLOW_NAMESPACE\":\"$$KFP_NAMESPACE\"}}" && \
+		-p "{\"stringData\":{\"MLFLOW_NAMESPACE\":\"$$KFP_NAMESPACE\",\"MLFLOW_TRACKING_TOKEN\":\"$$(oc whoami --show-token)\"}}" && \
 	\
 	echo "==> Applying git-credentials secret..." && \
 	oc create secret generic git-credentials \
@@ -22,14 +22,15 @@ install:
 		--from-literal=GIT_TOKEN="$$GIT_TOKEN" \
 		-n $$KFP_NAMESPACE --dry-run=client -o yaml | oc apply -f - && \
 	\
-	echo "==> Granting edit role to default service account..." && \
-	oc adm policy add-role-to-user edit -z default -n $$KFP_NAMESPACE && \
+	echo "==> Granting mlflow role to current user for MLflow workspace access..." && \
+	oc adm policy add-role-to-user mlflow $$(oc whoami) -n $$KFP_NAMESPACE && \
 	\
 	\
 	echo "==> Running helm upgrade..." && \
 	helm upgrade --install agent-mesh-for-sw resources/helm \
 		--create-namespace \
 		--set namespace="$$KFP_NAMESPACE" \
+		--set requester="$$(oc whoami)" \
 		--set repoUrl="$(GIT_REPO_URL)" \
 		--set minio.rootUser="$$AWS_ACCESS_KEY_ID" \
 		--set minio.rootPassword="$$AWS_SECRET_ACCESS_KEY" \
