@@ -88,7 +88,7 @@ kind: Notebook
 metadata:
   annotations:
     notebooks.opendatahub.io/inject-auth: "true"
-    notebooks.opendatahub.io/last-image-selection: "{{ .Values.dataGeneration.image.name}}:{{ .Values.version}}"
+    notebooks.opendatahub.io/last-image-selection: "custom-data-generation:{{ .Values.dataGeneration.image.version}}"
     opendatahub.io/workbench-image-namespace: {{ .Values.namespace }}
     opendatahub.io/image-display-name: Agent Mesh - Data Generation
     opendatahub.io/hardware-profile-name: default-profile
@@ -115,7 +115,7 @@ spec:
               git -C /opt/app-root/src reset --hard FETCH_HEAD
       containers:
         - name: {{ .Values.dataGeneration.notebook.name}}
-          image: {{ .Values.dataGeneration.image.name}}:{{ .Values.dataGeneration.image.version}}
+          image: image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/custom-data-generation:{{ .Values.dataGeneration.image.version}}
           workingDir: /opt/app-root/src
           resources:
             limits:
@@ -150,7 +150,7 @@ kind: Notebook
 metadata:
   annotations:
     notebooks.opendatahub.io/inject-auth: "true"
-    notebooks.opendatahub.io/last-image-selection: "{{ .Values.graphrag.image.name}}:{{ .Values.graphrag.image.version}}"
+    notebooks.opendatahub.io/last-image-selection: "custom-graphrag:{{ .Values.graphrag.image.version}}"
     opendatahub.io/workbench-image-namespace: {{ .Values.namespace }}
     opendatahub.io/image-display-name: Agent Mesh - GraphRAG Analysis
     opendatahub.io/hardware-profile-name: default-profile
@@ -177,7 +177,7 @@ spec:
               git -C /opt/app-root/src reset --hard FETCH_HEAD
       containers:
         - name: {{ .Values.graphrag.notebook.name}}
-          image: {{ .Values.graphrag.image.name}}:{{ .Values.graphrag.image.version}}
+          image: image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/custom-graphrag:{{ .Values.graphrag.image.version}}
           workingDir: /opt/app-root/src
           resources:
             limits:
