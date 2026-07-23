@@ -157,6 +157,9 @@ run-adhoc-query:
 		--set analysis.image.version="$$KFP_ANALYSIS_BASE_IMAGE_VERSION" \
 		-s templates/adhoc-query-job.yaml | oc apply -n $$KFP_NAMESPACE -f - && \
 	\
+	echo "==> Waiting for adhoc-query container to start..." && \
+	until oc logs job/run-adhoc-query -n $$KFP_NAMESPACE >/dev/null 2>&1; do sleep 2; done && \
+	\
 	echo "==> Streaming query results..." && \
 	oc logs -f job/run-adhoc-query -n $$KFP_NAMESPACE
 
