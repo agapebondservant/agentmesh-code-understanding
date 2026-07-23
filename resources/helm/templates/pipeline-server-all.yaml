@@ -34,7 +34,7 @@ spec:
     externalStorage:
       basePath: ""
       bucket: {{ .Values.minio.bucket }}pipelines
-      host: {{ .Values.minio.service }}.{{ .Values.minio.rootUser }}
+      host: {{ .Values.minio.service }}.{{ .Values.namespace }}
       port: "9000"
       region: us-east-1
       s3CredentialsSecret:
