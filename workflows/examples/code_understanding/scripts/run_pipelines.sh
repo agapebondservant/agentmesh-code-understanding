@@ -40,13 +40,14 @@ if [[ -z "${KFP_NAMESPACE:-}" ]]; then
     exit 1
 fi
 
-KFP_HOST="http://ds-pipeline-dspa.${KFP_NAMESPACE}.svc.cluster.local:8888"
+KFP_HOST="${KFP_HOST:-https://ds-pipeline-dspa.${KFP_NAMESPACE}.svc.cluster.local:8443}"
 if [[ -z "${KFP_IMAGE_REGISTRY}" ]]; then
     echo "Error: KFP_IMAGE_REGISTRY must be set and non-empty." >&2
     exit 1
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CODE_UNDERSTANDING_DIR="$(dirname "$SCRIPT_DIR")"
 COMPILED_DIR="$SCRIPT_DIR/compiled_pipelines"
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 TARGET_PATH="${KFP_DATA_GENERATION_OUTPUT_PATH:-target}"
@@ -62,7 +63,7 @@ mkdir -p "$COMPILED_DIR"
 # all pipelines to YAML in one pass.
 # ---------------------------------------------------------------------------
 echo "Converting kubeflow_generation.ipynb to script..."
-jupyter nbconvert --to script "$SCRIPT_DIR/utils/notebooks/kubeflow_generation.ipynb" \
+jupyter nbconvert --to script "$CODE_UNDERSTANDING_DIR/utils/notebooks/kubeflow_generation.ipynb" \
     --output "$COMPILED_DIR/${TIMESTAMP}_kubeflow_generation"
 
 echo "Compiling all pipelines..."
@@ -88,7 +89,8 @@ submit_pipeline() {
     echo "Submitting $run_name to $KFP_HOST..."
     python3 - "$yaml" "$run_name" "$params" <<PYEOF
 import sys, json, kfp
-client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE")
+client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE",
+                    ssl_ca_cert="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
 run = client.create_run_from_pipeline_package(
     pipeline_file=sys.argv[1],
     run_name=sys.argv[2],
@@ -114,7 +116,8 @@ upload_pipeline() {
     echo "Uploading $pipeline_name to $KFP_HOST..."
     python3 - "$yaml" "$pipeline_name" <<PYEOF
 import sys, kfp
-client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE")
+client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE",
+                    ssl_ca_cert="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
 pipeline = client.upload_pipeline(
     pipeline_package_path=sys.argv[1],
     pipeline_name=sys.argv[2],

@@ -5,7 +5,8 @@ python3 - <<'PYEOF'
 import os, sys, json
 from kfp.client import Client
 
-client = Client(host=os.environ["KFP_HOST"])
+client = Client(host=os.environ["KFP_HOST"],
+                ssl_ca_cert="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
 result = client.list_pipelines(filter=json.dumps({
     "predicates": [{"key": "display_name", "op": "EQUALS", "string_value": "single-data-generation-pipeline"}]
 }))
