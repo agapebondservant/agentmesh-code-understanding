@@ -43,3 +43,8 @@ analysis:
     version: latest
   notebook:
     name: graphrag-analysis
+
+adhocQuery:
+  graphragDir: "graph_rag_app/source"
+  useGlobal: "1"
+  retryCount: "3"

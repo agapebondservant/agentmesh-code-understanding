@@ -128,11 +128,11 @@ nohup python3 -m vllm.entrypoints.openai.api_server \
 
 ## Running Adhoc Queries
 1. To run adhoc queries about the indexed code, run the following:
-```scripts/run_adhoc_queries.sh <query>```
+```shell/adhoc.sh <query>```
    - For example: 
-     - `workflows/examples/code_understanding/scripts/run_adhoc_query.sh "What migration order would be recommended when refactoring to reduce breaking changes? Include the fully qualified names."`
-     - `workflows/examples/code_understanding/scripts/run_adhoc_query.sh "Which modules or components would be riskiest to refactor first? Include the fully qualified names."`
-     - `workflows/examples/code_understanding/scripts/run_adhoc_query.sh "Which modules or components would be the least risky to refactor first? Include the fully qualified names."`
+     - `shell/adhoc.sh "What migration order would be recommended when refactoring to reduce breaking changes? Include the fully qualified names."`
+     - `shell/adhoc.sh "Which modules or components would be riskiest to refactor first? Include the fully qualified names."`
+     - `shell/adhoc.sh "Which modules or components would be the least risky to refactor first? Include the fully qualified names."`
 
 ## More About the Code Understanding Workflow
 

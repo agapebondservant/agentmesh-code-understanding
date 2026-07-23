@@ -134,6 +134,32 @@ preload-mlflow-assets:
 		--set repoUrl="$(GIT_REPO_URL)" \
 		-s templates/upload-assets-job.yaml | oc apply -n $$KFP_NAMESPACE -f -
 
+run-adhoc-query:
+	@[ -z "$(QUESTION)" ] && { echo "Error: QUESTION is required. Usage: make run-adhoc-query QUESTION=\"your question\"" >&2; exit 1; } || true
+	@set -a && . $(ENV_FILE) && set +a && \
+	\
+	echo "==> Storing query parameters..." && \
+	oc delete secret adhoc-query-params -n $$KFP_NAMESPACE --ignore-not-found=true && \
+	oc create secret generic adhoc-query-params \
+		--from-literal=QUESTION='$(QUESTION)' \
+		-n $$KFP_NAMESPACE && \
+	\
+	echo "==> Submitting adhoc query job..." && \
+	oc delete job run-adhoc-query -n $$KFP_NAMESPACE --ignore-not-found=true && \
+	helm template agent-mesh-for-sw resources/helm \
+		--set namespace="$$KFP_NAMESPACE" \
+		--set repoUrl="$(GIT_REPO_URL)" \
+		--set-string adhocQuery.graphragDir="$${GRAPHRAG_DIR:-graph_rag_app/source}" \
+		--set-string adhocQuery.useGlobal="$${USE_GLOBAL:-1}" \
+		--set-string adhocQuery.retryCount="$${RETRY_COUNT:-3}" \
+		--set analysis.image.registry="$$KFP_IMAGE_REGISTRY" \
+		--set analysis.image.name="$$KFP_ANALYSIS_BASE_IMAGE_NAME" \
+		--set analysis.image.version="$$KFP_ANALYSIS_BASE_IMAGE_VERSION" \
+		-s templates/adhoc-query-job.yaml | oc apply -n $$KFP_NAMESPACE -f - && \
+	\
+	echo "==> Streaming query results..." && \
+	oc logs -f job/run-adhoc-query -n $$KFP_NAMESPACE
+
 run-pipelines:
 	@set -a && . $(ENV_FILE) && set +a && \
 	workflows/examples/code_understanding/scripts/run_pipelines.sh $(ARGS)
