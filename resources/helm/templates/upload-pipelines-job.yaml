@@ -21,8 +21,8 @@ spec:
             - |
               ELAPSED=0
               until wget -q --tries=1 --timeout=5 -O /dev/null "${KFP_HOST}/apis/v2beta1/healthz" 2>/dev/null; do
-                if [ "$ELAPSED" -ge 60 ]; then
-                  echo "Error: KFP_HOST ${KFP_HOST} not accessible after 60s" >&2
+                if [ "$ELAPSED" -ge 300 ]; then
+                  echo "Error: KFP_HOST ${KFP_HOST} not accessible after 300s" >&2
                   exit 1
                 fi
                 sleep 5
