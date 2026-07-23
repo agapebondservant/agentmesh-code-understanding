@@ -12,33 +12,6 @@ spec:
   template:
     spec:
       restartPolicy: Never
-      initContainers:
-        - name: wait-for-kfp
-          image: busybox
-          command:
-            - sh
-            - -c
-            - |
-              TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-              ELAPSED=0
-              until wget -q --tries=1 --timeout=5 --no-check-certificate \
-                --header="Authorization: Bearer $TOKEN" \
-                -O /dev/null "${KFP_HOST}/apis/v2beta1/healthz" 2>/dev/null; do
-                if [ "$ELAPSED" -ge 300 ]; then
-                  echo "Error: KFP_HOST ${KFP_HOST} not accessible after 300s" >&2
-                  exit 1
-                fi
-                sleep 5
-                ELAPSED=$((ELAPSED + 5))
-              done
-              echo "KFP is accessible at ${KFP_HOST}"
-          env:
-            - name: KFP_HOST
-              value: "https://ds-pipeline-dspa.{{ .Values.namespace }}.svc.cluster.local:8443"
-          envFrom:
-            - secretRef:
-                name: code-understanding-env
-                optional: true
       containers:
         - name: upload-pipelines
           image: registry.access.redhat.com/ubi9/python-311
