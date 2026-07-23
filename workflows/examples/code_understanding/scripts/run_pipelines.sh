@@ -69,6 +69,7 @@ jupyter nbconvert --to python "$CODE_UNDERSTANDING_DIR/utils/notebooks/kubeflow_
 echo "Compiling all pipelines..."
 PIPELINE_COMPILE_ONLY=1 \
 KFP_PIPELINE_OUTPUT_DIR="$YAML_DIR" \
+PYTHONPATH="$CODE_UNDERSTANDING_DIR:${PYTHONPATH:-}" \
 python3 "$TEMP_SCRIPT"
 echo "  Compiled YAMLs -> $YAML_DIR/"
 
@@ -88,9 +89,11 @@ submit_pipeline() {
     local params="${3:-{}}"
     echo "Submitting $run_name to $KFP_HOST..."
     python3 - "$yaml" "$run_name" "$params" <<PYEOF
-import sys, json, ssl, urllib3, kfp
-ssl._create_default_https_context = ssl._create_unverified_context
+import sys, json, urllib3, kfp_server_api.configuration as _kfp_conf, kfp
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+_orig_init = _kfp_conf.Configuration.__init__
+def _no_verify_init(self, *a, **kw): _orig_init(self, *a, **kw); self.verify_ssl = False
+_kfp_conf.Configuration.__init__ = _no_verify_init
 client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE")
 run = client.create_run_from_pipeline_package(
     pipeline_file=sys.argv[1],
