@@ -32,6 +32,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: minio
+  namespace: minio
 spec:
   replicas: 1
   selector:
