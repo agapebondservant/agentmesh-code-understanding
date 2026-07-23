@@ -6,10 +6,8 @@ metadata:
   namespace: {{ .Values.namespace }}
 type: Opaque
 stringData:
-  user: {{ .Values.minio.rootUser }}
-  password: {{ .Values.minio.rootPassword }}
-  host: minio
-  port: "9000"
+  AWS_ACCESS_KEY_ID: {{ .Values.minio.rootUser }}
+  AWS_SECRET_ACCESS_KEY: {{ .Values.minio.rootPassword }}
 ---
 apiVersion: datasciencepipelinesapplications.opendatahub.io/v1
 kind: DataSciencePipelinesApplication
