@@ -19,7 +19,7 @@ CODE_UNDERSTANDING_DIR="$(dirname "$SCRIPTS_DIR")"
 [ $# -lt 1 ] && { echo "Usage: $0 <question>"; exit 1; }
 
 QUESTION="$1"
-GRAPHRAG_DIR="${GRAPHRAG_DIR:-.}"
+GRAPHRAG_DIR="${GRAPHRAG_DIR:-'graph_rag_app/source'}"
 USE_GLOBAL="${USE_GLOBAL:-1}"
 RETRY_COUNT="${RETRY_COUNT:-3}"
 
