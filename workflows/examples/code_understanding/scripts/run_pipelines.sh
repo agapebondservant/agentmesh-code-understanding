@@ -53,15 +53,21 @@ trigger_pipeline() {
     local run_name="$2"
     local params="${3:-{}}"
     echo "Triggering $pipeline_name as $run_name on $KFP_HOST..."
-    python3 - "$pipeline_name" "$run_name" "$params" <<PYEOF
-import sys, json, subprocess, urllib3, kfp_server_api.configuration as _kfp_conf, kfp
+    # Pass pipeline_name, run_name, and params via env vars to avoid shell
+    # quoting issues when the JSON params string is passed as a CLI argument.
+    KFP_TRIGGER_PIPELINE="$pipeline_name" \
+    KFP_TRIGGER_RUN="$run_name" \
+    KFP_TRIGGER_PARAMS="$params" \
+    python3 <<PYEOF
+import os, sys, json, subprocess, urllib3, kfp_server_api.configuration as _kfp_conf, kfp
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 _kfp_conf.Configuration.verify_ssl = property(lambda self: False, lambda self, v: None)
 token = subprocess.check_output(["oc", "whoami", "--show-token"], text=True).strip()
 client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE", existing_token=token)
 
-pipeline_name, run_name = sys.argv[1], sys.argv[2]
-params = json.loads(sys.argv[3])
+pipeline_name = os.environ["KFP_TRIGGER_PIPELINE"]
+run_name = os.environ["KFP_TRIGGER_RUN"]
+params = json.loads(os.environ["KFP_TRIGGER_PARAMS"])
 
 result = client.list_pipelines(filter=json.dumps({
     "predicates": [{"key": "display_name", "operation": "EQUALS", "stringValue": pipeline_name}]
