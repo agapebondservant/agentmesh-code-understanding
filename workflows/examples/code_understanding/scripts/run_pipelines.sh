@@ -51,7 +51,8 @@ GRAPHRAG_SOURCE_PATH="${KFP_DATA_INDEXING_OUTPUT_PATH:-graph_rag_app/source}"
 trigger_pipeline() {
     local pipeline_name="$1"
     local run_name="$2"
-    local params="${3:-{}}"
+    local params="$3"
+    [ -z "$params" ] && params='{}'
     echo "Triggering $pipeline_name as $run_name on $KFP_HOST..."
     # Pass pipeline_name, run_name, and params via env vars to avoid shell
     # quoting issues when the JSON params string is passed as a CLI argument.
