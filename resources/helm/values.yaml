@@ -11,6 +11,7 @@ version: latest
 minio:
   rootUser: ""
   rootPassword: ""
+  namespace: minio
   service: minio-service
   bucket: demo
 
