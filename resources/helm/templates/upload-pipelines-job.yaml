@@ -19,8 +19,11 @@ spec:
             - sh
             - -c
             - |
+              TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
               ELAPSED=0
-              until wget -q --tries=1 --timeout=5 -O /dev/null "${KFP_HOST}/apis/v2beta1/healthz" 2>/dev/null; do
+              until wget -q --tries=1 --timeout=5 --no-check-certificate \
+                --header="Authorization: Bearer $TOKEN" \
+                -O /dev/null "${KFP_HOST}/apis/v2beta1/healthz" 2>/dev/null; do
                 if [ "$ELAPSED" -ge 300 ]; then
                   echo "Error: KFP_HOST ${KFP_HOST} not accessible after 300s" >&2
                   exit 1
@@ -31,7 +34,7 @@ spec:
               echo "KFP is accessible at ${KFP_HOST}"
           env:
             - name: KFP_HOST
-              value: "http://ds-pipeline-dspa.{{ .Values.namespace }}.svc.cluster.local:8888"
+              value: "https://ds-pipeline-dspa.{{ .Values.namespace }}.svc.cluster.local:8443"
           envFrom:
             - secretRef:
                 name: code-understanding-env
@@ -49,15 +52,15 @@ spec:
               git -C /opt/app-root/src remote add origin "{{ .Values.repoUrl }}" 2>/dev/null || true
               git -C /opt/app-root/src fetch origin "{{ .Values.repoRef }}"
               git -C /opt/app-root/src reset --hard FETCH_HEAD
-              if workflows/examples/code_understanding/pre_check_pipelines.sh; then
+              if workflows/examples/code_understanding/shell/pre_check_pipelines.sh; then
                 echo "Pipelines already exist, skipping upload."
                 exit 0
               fi
-              workflows/examples/code_understanding/run_pipelines.sh --upload-single --upload-aggregated
+              workflows/examples/code_understanding/shell/run_pipelines.sh --upload-single --upload-aggregated
           workingDir: /opt/app-root/src
           env:
             - name: KFP_HOST
-              value: "http://ds-pipeline-dspa.{{ .Values.namespace }}.svc.cluster.local:8888"
+              value: "https://ds-pipeline-dspa.{{ .Values.namespace }}.svc.cluster.local:8443"
           envFrom:
             - secretRef:
                 name: code-understanding-env
