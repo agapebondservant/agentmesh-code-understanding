@@ -52,11 +52,11 @@ spec:
               git -C /opt/app-root/src remote add origin "{{ .Values.repoUrl }}" 2>/dev/null || true
               git -C /opt/app-root/src fetch origin "{{ .Values.repoRef }}"
               git -C /opt/app-root/src reset --hard FETCH_HEAD
-              if workflows/examples/code_understanding/shell/pre_check_pipelines.sh; then
+              if workflows/examples/code_understanding/scripts/pre_check_pipelines.sh; then
                 echo "Pipelines already exist, skipping upload."
                 exit 0
               fi
-              workflows/examples/code_understanding/shell/run_pipelines.sh --upload-single --upload-aggregated
+              workflows/examples/code_understanding/scripts/run_pipelines.sh --upload-single --upload-aggregated
           workingDir: /opt/app-root/src
           env:
             - name: KFP_HOST

@@ -136,4 +136,4 @@ preload-mlflow-assets:
 
 run-pipelines:
 	@set -a && . $(ENV_FILE) && set +a && \
-	workflows/examples/code_understanding/shell/run_pipelines.sh $(ARGS)
+	workflows/examples/code_understanding/scripts/run_pipelines.sh $(ARGS)
