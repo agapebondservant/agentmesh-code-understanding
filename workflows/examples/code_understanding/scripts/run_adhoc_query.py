@@ -3,9 +3,9 @@
 CLI for querying a GraphRAG index with an LLM.
 
 Usage:
-  python shell/adhoc_query.py "Which modules are riskiest to refactor?"
-  python shell/adhoc_query.py "What security vulnerabilities exist?" --root-dir graph_rag_app/source
-  python shell/adhoc_query.py "List dependencies" --local --retry-count 5
+  python scripts/run_adhoc_query.py "Which modules are riskiest to refactor?"
+  python scripts/run_adhoc_query.py "What security vulnerabilities exist?" --root-dir graph_rag_app/source
+  python scripts/run_adhoc_query.py "List dependencies" --local --retry-count 5
 """
 import argparse
 import asyncio
@@ -13,6 +13,8 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
+import logging
+logging.basicConfig(level=logging.INFO)
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -33,11 +35,11 @@ result = asyncio.run(analyzer.query_with_llm(
     use_global=not args.local,
 ))
 
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
 result_file = f"adhoc_query_{timestamp}.txt"
 
 Path(result_file).write_text(f"Question: {args.question}\n\nAnswer:\n{result}")
 
 DefaultAssetLoader().log_results(result_file, artifact_path="results/adhoc_queries")
 
-print(result)
+logging.info(result)
