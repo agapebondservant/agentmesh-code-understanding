@@ -63,7 +63,7 @@ mkdir -p "$COMPILED_DIR"
 # all pipelines to YAML in one pass.
 # ---------------------------------------------------------------------------
 echo "Converting kubeflow_generation.ipynb to script..."
-jupyter nbconvert --to script "$CODE_UNDERSTANDING_DIR/utils/notebooks/kubeflow_generation.ipynb" \
+jupyter nbconvert --to python "$CODE_UNDERSTANDING_DIR/utils/notebooks/kubeflow_generation.ipynb" \
     --output "$COMPILED_DIR/${TIMESTAMP}_kubeflow_generation"
 
 echo "Compiling all pipelines..."
@@ -88,9 +88,10 @@ submit_pipeline() {
     local params="${3:-{}}"
     echo "Submitting $run_name to $KFP_HOST..."
     python3 - "$yaml" "$run_name" "$params" <<PYEOF
-import sys, json, kfp
-client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE",
-                    ssl_ca_cert="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
+import sys, json, ssl, urllib3, kfp
+ssl._create_default_https_context = ssl._create_unverified_context
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE")
 run = client.create_run_from_pipeline_package(
     pipeline_file=sys.argv[1],
     run_name=sys.argv[2],
