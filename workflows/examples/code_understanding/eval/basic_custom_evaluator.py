@@ -20,7 +20,7 @@ def _llm_kwargs(prefix: str) -> dict:
     }
 
 
-class LocalCustomEvaluator(CustomEvaluator):
+class BasicCustomEvaluator(CustomEvaluator):
     """LLM-as-judge evaluator using direct LiteLLM calls without an external evaluation framework.
 
     Reads model configuration from environment variables:
@@ -112,6 +112,6 @@ Respond ONLY with valid JSON in this exact format:
 
         except Exception as e:
 
-            logging.error(f"Error during local evaluation: {e}")
+            logging.error(f"Error during basic evaluation: {e}")
 
             raise e
