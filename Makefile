@@ -34,6 +34,7 @@ install:
 	echo "==> Preloading MLflow assets..." && \
 	$(MAKE) preload-mlflow-assets || true && \
 	$(MAKE) deploy-notebooks || true
+	$(MAKE) upload-pipelines
 
 deploy-notebooks:
 	@set -a && . $(ENV_FILE) && set +a && \
@@ -104,6 +105,21 @@ build-images:
 	podman build -t "$$ANALYSIS_IMG" resources/images/data-generation && \
 	echo "==> Pushing analysis image..." && \
 	podman push "$$ANALYSIS_IMG"
+
+upload-pipelines:
+	@set -a && . $(ENV_FILE) && set +a && \
+	\
+	echo "==> Waiting for pipeline server to be ready..." && \
+	until oc get deployment ds-pipeline-dspa -n $$KFP_NAMESPACE 2>/dev/null; do sleep 5; done && \
+	oc wait deployment/ds-pipeline-dspa -n $$KFP_NAMESPACE --for=condition=Available --timeout=300s && \
+	\
+	echo "==> Uploading Kubeflow pipelines..." && \
+	oc delete job upload-kubeflow-pipelines -n $$KFP_NAMESPACE --ignore-not-found=true && \
+	helm template agent-mesh-for-sw resources/helm \
+		--set namespace="$$KFP_NAMESPACE" \
+		--set requester="$$(oc whoami)" \
+		--set repoUrl="$(GIT_REPO_URL)" \
+		-s templates/upload-pipelines-job.yaml | oc apply -n $$KFP_NAMESPACE -f -
 
 preload-mlflow-assets:
 	@set -a && . $(ENV_FILE) && set +a && \
