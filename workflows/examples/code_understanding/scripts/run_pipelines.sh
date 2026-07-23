@@ -91,9 +91,7 @@ submit_pipeline() {
     python3 - "$yaml" "$run_name" "$params" <<PYEOF
 import sys, json, urllib3, kfp_server_api.configuration as _kfp_conf, kfp
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-_orig_init = _kfp_conf.Configuration.__init__
-def _no_verify_init(self, *a, **kw): _orig_init(self, *a, **kw); self.verify_ssl = False
-_kfp_conf.Configuration.__init__ = _no_verify_init
+_kfp_conf.Configuration.verify_ssl = property(lambda self: False, lambda self, v: None)
 client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE")
 run = client.create_run_from_pipeline_package(
     pipeline_file=sys.argv[1],
@@ -119,9 +117,10 @@ upload_pipeline() {
     local pipeline_name="$2"
     echo "Uploading $pipeline_name to $KFP_HOST..."
     python3 - "$yaml" "$pipeline_name" <<PYEOF
-import sys, kfp
-client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE",
-                    ssl_ca_cert="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
+import sys, urllib3, kfp_server_api.configuration as _kfp_conf, kfp
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+_kfp_conf.Configuration.verify_ssl = property(lambda self: False, lambda self, v: None)
+client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE")
 pipeline = client.upload_pipeline(
     pipeline_package_path=sys.argv[1],
     pipeline_name=sys.argv[2],
