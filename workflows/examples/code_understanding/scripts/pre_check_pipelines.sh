@@ -12,7 +12,7 @@ with open("/var/run/secrets/kubernetes.io/serviceaccount/token") as _f:
     _token = _f.read().strip()
 client = Client(host=os.environ["KFP_HOST"], existing_token=_token)
 result = client.list_pipelines(filter=json.dumps({
-    "predicates": [{"key": "display_name", "op": "EQUALS", "string_value": "single-data-generation-pipeline"}]
+    "predicates": [{"key": "display_name", "operation": "EQUALS", "stringValue": "single_full"}]
 }))
 if result.pipelines:
     print("Pipelines already uploaded, skipping.")

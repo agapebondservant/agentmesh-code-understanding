@@ -125,11 +125,28 @@ _kfp_conf.Configuration.verify_ssl = property(lambda self: False, lambda self, v
 with open("/var/run/secrets/kubernetes.io/serviceaccount/token") as _f:
     _token = _f.read().strip()
 client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE", existing_token=_token)
-pipeline = client.upload_pipeline(
-    pipeline_package_path=sys.argv[1],
-    pipeline_name=sys.argv[2],
-)
-print(f"  Uploaded pipeline id: {pipeline.pipeline_id}")
+try:
+    pipeline = client.upload_pipeline(
+        pipeline_package_path=sys.argv[1],
+        pipeline_name=sys.argv[2],
+    )
+    print(f"  Uploaded pipeline id: {pipeline.pipeline_id}")
+except Exception as e:
+    if getattr(e, "status", None) == 409:
+        import json
+        from datetime import datetime
+        result = client.list_pipelines(filter=json.dumps({
+            "predicates": [{"key": "display_name", "operation": "EQUALS", "stringValue": sys.argv[2]}]
+        }))
+        pipeline_id = result.pipelines[0].pipeline_id
+        version = client.upload_pipeline_version(
+            pipeline_package_path=sys.argv[1],
+            pipeline_version_name=datetime.utcnow().strftime("%Y%m%d%H%M%S"),
+            pipeline_id=pipeline_id,
+        )
+        print(f"  Uploaded new version id: {version.pipeline_version_id}")
+    else:
+        raise
 PYEOF
     echo "  OK: $pipeline_name uploaded."
 }
