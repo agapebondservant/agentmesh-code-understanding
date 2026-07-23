@@ -49,7 +49,8 @@ deploy-notebooks:
 	echo "  image: $$GRAPHRAG_IMAGE" && \
 	\
 	echo "==> Deploying notebooks..." && \
-	sleep 60 && \
+	sleep 10 && \
+	oc delete notebook data-generation graphrag-indexing -n $$KFP_NAMESPACE --ignore-not-found=true --wait=true && \
 	helm template agent-mesh-for-sw resources/helm \
 		--set namespace="$$KFP_NAMESPACE" \
 		--set requester="$$(oc whoami)" \
