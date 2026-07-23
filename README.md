@@ -18,7 +18,7 @@ Contents
 <a id="overview"></a>
 ## 🧭 Overview
 
-[![Watch the demo](https://drive.google.com/thumbnail?id=18FxSpwKBPPgzQnP1Q9ToPC_kLskrnni3&sz=w1280)](https://drive.google.com/file/d/18FxSpwKBPPgzQnP1Q9ToPC_kLskrnni3/view)
+[![Watch the demo](https://youtu.be/swRB1iAyGr0)](https://drive.google.com/file/d/18FxSpwKBPPgzQnP1Q9ToPC_kLskrnni3/view)
 *▶ Click to watch the demo*
 
 This demonstrates the **Code Understanding** phase of the Agent Mesh for Software Engineering, a framework pattern 
