@@ -63,7 +63,12 @@ trigger_pipeline() {
 import os, sys, json, subprocess, urllib3, kfp_server_api.configuration as _kfp_conf, kfp
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 _kfp_conf.Configuration.verify_ssl = property(lambda self: False, lambda self, v: None)
-token = subprocess.check_output(["oc", "whoami", "--show-token"], text=True).strip()
+_SA = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+if os.path.exists(_SA):
+    with open(_SA) as _f:
+        token = _f.read().strip()
+else:
+    token = subprocess.check_output(["oc", "whoami", "--show-token"], text=True).strip()
 client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE", existing_token=token)
 
 pipeline_name = os.environ["KFP_TRIGGER_PIPELINE"]

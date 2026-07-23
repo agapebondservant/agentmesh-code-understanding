@@ -48,3 +48,8 @@ adhocQuery:
   graphragDir: "graph_rag_app/source"
   useGlobal: "1"
   retryCount: "3"
+
+runPipelines:
+  args: "--single"
+  targetPath: "target"
+  graphragSourcePath: "graph_rag_app/source"

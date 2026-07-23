@@ -165,4 +165,19 @@ run-adhoc-query:
 
 run-pipelines:
 	@set -a && . $(ENV_FILE) && set +a && \
-	workflows/examples/code_understanding/scripts/run_pipelines.sh $(ARGS)
+	\
+	echo "==> Submitting run-pipelines job..." && \
+	oc delete job run-pipelines -n $$KFP_NAMESPACE --ignore-not-found=true && \
+	helm template agent-mesh-for-sw resources/helm \
+		--set namespace="$$KFP_NAMESPACE" \
+		--set repoUrl="$(GIT_REPO_URL)" \
+		--set-string runPipelines.args="$${ARGS:---single}" \
+		--set-string runPipelines.targetPath="$${KFP_DATA_GENERATION_OUTPUT_PATH:-target}" \
+		--set-string runPipelines.graphragSourcePath="$${KFP_DATA_INDEXING_OUTPUT_PATH:-graph_rag_app/source}" \
+		-s templates/run-pipelines-job.yaml | oc apply -n $$KFP_NAMESPACE -f - && \
+	\
+	echo "==> Waiting for run-pipelines container to start..." && \
+	until oc logs job/run-pipelines -n $$KFP_NAMESPACE >/dev/null 2>&1; do sleep 2; done && \
+	\
+	echo "==> Streaming pipeline run results..." && \
+	oc logs -f job/run-pipelines -n $$KFP_NAMESPACE
