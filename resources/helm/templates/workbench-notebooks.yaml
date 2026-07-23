@@ -32,6 +32,9 @@ spec:
               git -C /opt/app-root/src remote add origin "{{ .Values.repoUrl }}" 2>/dev/null || true
               git -C /opt/app-root/src fetch origin "{{ .Values.repoRef }}"
               git -C /opt/app-root/src reset --hard FETCH_HEAD
+          volumeMounts:
+            - name: workspace-volume
+              mountPath: /opt/app-root/src
       containers:
         - name: {{ .Values.dataGeneration.notebook.name}}
           image: {{ $datagen_image }}
@@ -94,6 +97,9 @@ spec:
               git -C /opt/app-root/src remote add origin "{{ .Values.repoUrl }}" 2>/dev/null || true
               git -C /opt/app-root/src fetch origin "{{ .Values.repoRef }}"
               git -C /opt/app-root/src reset --hard FETCH_HEAD
+          volumeMounts:
+            - name: workspace-volume
+              mountPath: /opt/app-root/src
       containers:
         - name: {{ .Values.graphrag.notebook.name}}
           image: {{ $graphrag_image }}
