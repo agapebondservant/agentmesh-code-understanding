@@ -92,7 +92,9 @@ submit_pipeline() {
 import sys, json, urllib3, kfp_server_api.configuration as _kfp_conf, kfp
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 _kfp_conf.Configuration.verify_ssl = property(lambda self: False, lambda self, v: None)
-client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE")
+with open("/var/run/secrets/kubernetes.io/serviceaccount/token") as _f:
+    _token = _f.read().strip()
+client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE", existing_token=_token)
 run = client.create_run_from_pipeline_package(
     pipeline_file=sys.argv[1],
     run_name=sys.argv[2],
@@ -120,7 +122,9 @@ upload_pipeline() {
 import sys, urllib3, kfp_server_api.configuration as _kfp_conf, kfp
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 _kfp_conf.Configuration.verify_ssl = property(lambda self: False, lambda self, v: None)
-client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE")
+with open("/var/run/secrets/kubernetes.io/serviceaccount/token") as _f:
+    _token = _f.read().strip()
+client = kfp.Client(host="$KFP_HOST", namespace="$KFP_NAMESPACE", existing_token=_token)
 pipeline = client.upload_pipeline(
     pipeline_package_path=sys.argv[1],
     pipeline_name=sys.argv[2],

@@ -12,6 +12,7 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      serviceAccountName: pipeline-upload-job
       containers:
         - name: upload-pipelines
           image: registry.access.redhat.com/ubi9/python-311
@@ -34,6 +35,8 @@ spec:
           env:
             - name: KFP_HOST
               value: "https://ds-pipeline-dspa.{{ .Values.namespace }}.svc.cluster.local:8443"
+            - name: KFP_NAMESPACE
+              value: "{{ .Values.namespace }}"
           envFrom:
             - secretRef:
                 name: code-understanding-env

@@ -8,7 +8,9 @@ import kfp_server_api.configuration as _kfp_conf
 _kfp_conf.Configuration.verify_ssl = property(lambda self: False, lambda self, v: None)
 from kfp.client import Client
 
-client = Client(host=os.environ["KFP_HOST"])
+with open("/var/run/secrets/kubernetes.io/serviceaccount/token") as _f:
+    _token = _f.read().strip()
+client = Client(host=os.environ["KFP_HOST"], existing_token=_token)
 result = client.list_pipelines(filter=json.dumps({
     "predicates": [{"key": "display_name", "op": "EQUALS", "string_value": "single-data-generation-pipeline"}]
 }))
